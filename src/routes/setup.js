@@ -2,6 +2,14 @@ const express = require('express');
 const router = express.Router();
 const { Client } = require('pg');
 
+router.get('/debug', (req, res) => {
+  res.json({
+    NODE_ENV: process.env.NODE_ENV,
+    DATABASE_URL: process.env.DATABASE_URL ? 'exists' : 'missing',
+    DATABASE_URL_PREVIEW: process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 30) + '...' : 'none'
+  });
+});
+
 router.get('/tables', async (req, res) => {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
