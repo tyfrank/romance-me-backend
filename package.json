@@ -14,6 +14,7 @@
     "book1:seed": "node src/config/seed-book1.js",
     "admin:setup": "node src/config/admin-setup.js",
     "db:setup-production": "node setup-production-db.js",
+    "payment-tables": "node create-payment-tables.js",
     "test": "jest"
   },
   "dependencies": {
