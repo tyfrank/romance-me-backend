@@ -1,63 +1,49 @@
 const express = require('express');
 const router = express.Router();
-const { Client } = require('pg');
+const db = require('../config/database');
 
 router.get('/debug', (req, res) => {
   res.json({
     NODE_ENV: process.env.NODE_ENV,
-    DATABASE_URL: process.env.DATABASE_URL ? 'exists' : 'missing',
-    DATABASE_URL_PREVIEW: process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 30) + '...' : 'none'
+    DB_HOST: process.env.DB_HOST ? 'exists' : 'missing',
+    DB_NAME: process.env.DB_NAME ? 'exists' : 'missing',
+    DB_USER: process.env.DB_USER ? 'exists' : 'missing',
+    DB_PASSWORD: process.env.DB_PASSWORD ? 'exists' : 'missing'
   });
 });
 
 router.get('/tables', async (req, res) => {
-  const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: false
-  });
-
   try {
-    await client.connect();
-    const result = await client.query(`
+    const result = await db.query(`
       SELECT table_name 
       FROM information_schema.tables 
       WHERE table_schema = 'public'
       ORDER BY table_name;
     `);
     
-    await client.end();
-    
     res.json({
       success: true,
       tables: result.rows.map(row => row.table_name)
     });
   } catch (error) {
-    await client.end().catch(() => {});
     res.status(500).json({ 
       success: false, 
       error: error.message,
-      stack: error.stack,
-      connectionString: process.env.DATABASE_URL ? 'exists' : 'missing'
+      stack: error.stack
     });
   }
 });
 
 router.post('/database', async (req, res) => {
-  const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: false
-  });
-
   try {
-    await client.connect();
-    console.log('Connected to database');
+    console.log('Starting database setup...');
 
     // Enable UUID extension
-    await client.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
+    await db.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
     console.log('UUID extension enabled');
 
     // Create users table first (if it doesn't exist)
-    await client.query(`
+    await db.query(`
       CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         email VARCHAR(255) UNIQUE NOT NULL,
@@ -70,7 +56,7 @@ router.post('/database', async (req, res) => {
     console.log('✅ users table created');
 
     // Create user_profiles table
-    await client.query(`
+    await db.query(`
       CREATE TABLE IF NOT EXISTS user_profiles (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -96,7 +82,7 @@ router.post('/database', async (req, res) => {
     console.log('✅ user_profiles table created');
 
     // Create books table
-    await client.query(`
+    await db.query(`
       CREATE TABLE IF NOT EXISTS books (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         title VARCHAR(255) NOT NULL,
@@ -119,7 +105,7 @@ router.post('/database', async (req, res) => {
     console.log('✅ books table created');
 
     // Create chapters table
-    await client.query(`
+    await db.query(`
       CREATE TABLE IF NOT EXISTS chapters (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         book_id UUID NOT NULL REFERENCES books(id) ON DELETE CASCADE,
@@ -137,7 +123,7 @@ router.post('/database', async (req, res) => {
     console.log('✅ chapters table created');
 
     // Create reading_progress table
-    await client.query(`
+    await db.query(`
       CREATE TABLE IF NOT EXISTS reading_progress (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -154,7 +140,7 @@ router.post('/database', async (req, res) => {
     console.log('✅ reading_progress table created');
 
     // Create user_rewards table
-    await client.query(`
+    await db.query(`
       CREATE TABLE IF NOT EXISTS user_rewards (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -168,9 +154,10 @@ router.post('/database', async (req, res) => {
         UNIQUE(user_id)
       );
     `);
+    console.log('✅ user_rewards table created');
 
     // Create reward_transactions table
-    await client.query(`
+    await db.query(`
       CREATE TABLE IF NOT EXISTS reward_transactions (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -183,9 +170,10 @@ router.post('/database', async (req, res) => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    console.log('✅ reward_transactions table created');
 
     // Create user_subscriptions table
-    await client.query(`
+    await db.query(`
       CREATE TABLE IF NOT EXISTS user_subscriptions (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -199,9 +187,10 @@ router.post('/database', async (req, res) => {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    console.log('✅ user_subscriptions table created');
 
     // Create user_chapter_unlocks table
-    await client.query(`
+    await db.query(`
       CREATE TABLE IF NOT EXISTS user_chapter_unlocks (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -213,8 +202,7 @@ router.post('/database', async (req, res) => {
         UNIQUE(user_id, book_id, chapter_number)
       );
     `);
-
-    await client.end();
+    console.log('✅ user_chapter_unlocks table created');
 
     res.json({
       success: true,
@@ -227,13 +215,11 @@ router.post('/database', async (req, res) => {
     
   } catch (error) {
     console.error('Database setup failed:', error);
-    await client.end().catch(() => {});
     res.status(500).json({
       success: false,
       message: 'Database setup failed',
       error: error.message,
-      stack: error.stack,
-      connectionString: process.env.DATABASE_URL ? 'exists' : 'missing'
+      stack: error.stack
     });
   }
 });
