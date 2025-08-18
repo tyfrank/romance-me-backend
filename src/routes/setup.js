@@ -24,7 +24,13 @@ router.get('/tables', async (req, res) => {
       tables: result.rows.map(row => row.table_name)
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    await client.end().catch(() => {});
+    res.status(500).json({ 
+      success: false, 
+      error: error.message,
+      stack: error.stack,
+      connectionString: process.env.DATABASE_URL ? 'exists' : 'missing'
+    });
   }
 });
 
@@ -213,10 +219,13 @@ router.post('/database', async (req, res) => {
     
   } catch (error) {
     console.error('Database setup failed:', error);
+    await client.end().catch(() => {});
     res.status(500).json({
       success: false,
       message: 'Database setup failed',
-      error: error.message
+      error: error.message,
+      stack: error.stack,
+      connectionString: process.env.DATABASE_URL ? 'exists' : 'missing'
     });
   }
 });
