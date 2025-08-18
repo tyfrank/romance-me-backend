@@ -13,7 +13,7 @@ router.get('/debug', (req, res) => {
 router.get('/tables', async (req, res) => {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: false
   });
 
   try {
@@ -45,7 +45,7 @@ router.get('/tables', async (req, res) => {
 router.post('/database', async (req, res) => {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: false
   });
 
   try {
