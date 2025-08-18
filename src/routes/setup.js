@@ -2,6 +2,32 @@ const express = require('express');
 const router = express.Router();
 const { Client } = require('pg');
 
+router.get('/tables', async (req, res) => {
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  });
+
+  try {
+    await client.connect();
+    const result = await client.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public'
+      ORDER BY table_name;
+    `);
+    
+    await client.end();
+    
+    res.json({
+      success: true,
+      tables: result.rows.map(row => row.table_name)
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 router.post('/database', async (req, res) => {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -11,6 +37,10 @@ router.post('/database', async (req, res) => {
   try {
     await client.connect();
     console.log('Connected to database');
+
+    // Enable UUID extension
+    await client.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
+    console.log('UUID extension enabled');
 
     // Create user_rewards table
     await client.query(`
