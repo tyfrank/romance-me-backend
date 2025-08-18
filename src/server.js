@@ -11,6 +11,7 @@ const bookRoutes = require('./routes/books');
 const adminRoutes = require('./routes/admin');
 const rewardsRoutes = require('./routes/rewards');
 const paymentRoutes = require('./routes/payments');
+const setupRoutes = require('./routes/setup');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -64,6 +65,7 @@ app.use('/api/books', bookRoutes);
 app.use('/api/rewards', rewardsRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/setup', setupRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
