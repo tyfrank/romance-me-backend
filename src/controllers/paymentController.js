@@ -263,13 +263,18 @@ const processCoinPurchase = async (userId, packageId, coins, paymentIntent) => {
       [newTotal, coins, userId]
     );
 
-    // Record transaction
-    await client.query(
-      `INSERT INTO reward_transactions 
-       (user_id, transaction_type, amount, reason, reference_type, reference_id, balance_after)
-       VALUES ($1, 'purchased', $2, $3, 'stripe_payment', $4, $5)`,
-      [userId, coins, `Purchased ${COIN_PACKAGES[packageId].name}`, paymentIntent.id, newTotal]
-    );
+    // Record transaction (with error handling for missing tables)
+    try {
+      await client.query(
+        `INSERT INTO reward_transactions 
+         (user_id, transaction_type, amount, reason, reference_type, reference_id, balance_after)
+         VALUES ($1, 'purchased', $2, $3, 'stripe_payment', $4, $5)`,
+        [userId, coins, `Purchased ${COIN_PACKAGES[packageId].name}`, paymentIntent.id, newTotal]
+      );
+    } catch (insertError) {
+      console.log('Transaction logging failed (table may not exist), but payment succeeded:', insertError.message);
+      // Continue with payment success even if transaction logging fails
+    }
 
     await client.query('COMMIT');
     
