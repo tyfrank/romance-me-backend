@@ -1,0 +1,9 @@
+[build]
+command = "npm install"
+
+[deploy]
+healthcheckPath = "/api/health"
+restartPolicyType = "on_failure"
+
+[env]
+NODE_ENV = "production"
