@@ -243,25 +243,34 @@ const processCoinPurchase = async (userId, packageId, coins, paymentIntent) => {
     let currentCoins = 0;
     if (rewardsResult.rows.length > 0) {
       currentCoins = rewardsResult.rows[0].total_coins;
+      console.log(`User ${userId} current coins: ${currentCoins}`);
     } else {
       // Create rewards record if doesn't exist
+      console.log(`Creating new rewards record for user ${userId}`);
       await client.query(
         'INSERT INTO user_rewards (user_id) VALUES ($1)',
         [userId]
       );
+      console.log(`New rewards record created for user ${userId}`);
     }
 
     const newTotal = currentCoins + coins;
 
     // Update user coins
-    await client.query(
-      `UPDATE user_rewards 
-       SET total_coins = $1, 
-           total_coins_earned = total_coins_earned + $2,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE user_id = $3`,
-      [newTotal, coins, userId]
-    );
+    try {
+      const updateResult = await client.query(
+        `UPDATE user_rewards 
+         SET total_coins = $1, 
+             total_coins_earned = total_coins_earned + $2,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE user_id = $3`,
+        [newTotal, coins, userId]
+      );
+      console.log(`Coins updated for user ${userId}: ${coins} coins added, new total: ${newTotal}. Rows affected: ${updateResult.rowCount}`);
+    } catch (updateError) {
+      console.error('Failed to update user coins:', updateError);
+      throw updateError; // Re-throw to rollback transaction
+    }
 
     // Record transaction (with error handling for missing tables)
     try {
