@@ -13,6 +13,7 @@
     "content:migrate": "node src/config/content-migration.js",
     "book1:seed": "node src/config/seed-book1.js",
     "admin:setup": "node src/config/admin-setup.js",
+    "db:setup-production": "node setup-production-db.js",
     "test": "jest"
   },
   "dependencies": {
