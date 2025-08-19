@@ -61,6 +61,7 @@ router.get('/db-info', async (req, res) => {
   try {
     const booksCount = await db.query('SELECT COUNT(*) as count FROM books');
     const publishedCount = await db.query('SELECT COUNT(*) as count FROM books WHERE is_published = true');
+    const booksResult = await db.query('SELECT title, author, is_published, created_at FROM books ORDER BY created_at DESC');
     const tablesResult = await db.query(`
       SELECT table_name 
       FROM information_schema.tables 
@@ -71,6 +72,7 @@ router.get('/db-info', async (req, res) => {
     res.json({
       totalBooks: booksCount.rows[0].count,
       publishedBooks: publishedCount.rows[0].count,
+      books: booksResult.rows,
       tables: tablesResult.rows.map(r => r.table_name),
       databaseUrl: process.env.DATABASE_URL ? 'Set' : 'Not set'
     });
