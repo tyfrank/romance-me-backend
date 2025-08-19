@@ -204,7 +204,7 @@ const getCurrentReading = async (req, res) => {
         b.cover_image_url as cover_image,
         b.status,
         c.title as chapter_title
-       FROM reading_progress rp
+       FROM user_reading_progress rp
        JOIN books b ON rp.book_id = b.id
        LEFT JOIN chapters c ON b.id = c.book_id AND c.chapter_number = rp.current_chapter_number
        WHERE rp.user_id = $1 
