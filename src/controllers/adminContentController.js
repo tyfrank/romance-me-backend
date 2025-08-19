@@ -120,7 +120,7 @@ const getDashboardStats = async (req, res) => {
         u.email as user_email,
         rp.current_chapter_number,
         rp.progress_percentage
-      FROM reading_progress rp
+      FROM user_reading_progress rp
       JOIN books b ON rp.book_id = b.id
       JOIN users u ON rp.user_id = u.id
       ORDER BY rp.last_read_at DESC
@@ -204,7 +204,7 @@ const getBook = async (req, res) => {
              COUNT(rp.id) as readers_count
       FROM books b
       LEFT JOIN chapters c ON b.id = c.book_id
-      LEFT JOIN reading_progress rp ON b.id = rp.book_id
+      LEFT JOIN user_reading_progress rp ON b.id = rp.book_id
       WHERE b.id = $1
       GROUP BY b.id
     `, [id]);
