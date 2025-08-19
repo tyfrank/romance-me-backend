@@ -176,7 +176,7 @@ const getBooks = async (req, res) => {
       const progressResult = await db.query(
         `SELECT book_id, current_chapter_number, total_chapters_read, progress_percentage, 
                 last_read_at, completed_at
-         FROM reading_progress 
+         FROM user_reading_progress 
          WHERE user_id = $1 AND book_id = ANY($2)`,
         [req.user.id, booksResult.rows.map(book => book.id)]
       );
@@ -237,7 +237,7 @@ const getBookById = async (req, res) => {
       const progressResult = await db.query(
         `SELECT current_chapter_number, total_chapters_read, progress_percentage,
                 last_read_at, started_at, completed_at
-         FROM reading_progress 
+         FROM user_reading_progress 
          WHERE user_id = $1 AND book_id = $2`,
         [req.user.id, id]
       );
@@ -352,17 +352,17 @@ const updateReadingProgress = async (userId, bookId, currentChapter, totalChapte
     const isCompleted = currentChapter === totalChapters;
     
     await db.query(
-      `INSERT INTO reading_progress 
+      `INSERT INTO user_reading_progress 
        (user_id, book_id, current_chapter_number, total_chapters_read, progress_percentage, 
         last_read_at, completed_at)
        VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, $6)
        ON CONFLICT (user_id, book_id) 
        DO UPDATE SET 
-         current_chapter_number = GREATEST(reading_progress.current_chapter_number, $3),
-         total_chapters_read = GREATEST(reading_progress.total_chapters_read, $4),
-         progress_percentage = GREATEST(reading_progress.progress_percentage, $5),
+         current_chapter_number = GREATEST(user_reading_progress.current_chapter_number, $3),
+         total_chapters_read = GREATEST(user_reading_progress.total_chapters_read, $4),
+         progress_percentage = GREATEST(user_reading_progress.progress_percentage, $5),
          last_read_at = CURRENT_TIMESTAMP,
-         completed_at = CASE WHEN $6 IS NOT NULL THEN $6 ELSE reading_progress.completed_at END`,
+         completed_at = CASE WHEN $6 IS NOT NULL THEN $6 ELSE user_reading_progress.completed_at END`,
       [userId, bookId, currentChapter, currentChapter, progressPercentage, 
        isCompleted ? new Date() : null]
     );
