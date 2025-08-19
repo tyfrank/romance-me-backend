@@ -12,6 +12,7 @@ const adminRoutes = require('./routes/admin');
 const rewardsRoutes = require('./routes/rewards');
 const paymentRoutes = require('./routes/payments');
 const setupRoutes = require('./routes/setup');
+const testRoutes = require('./routes/test');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -66,6 +67,7 @@ app.use('/api/rewards', rewardsRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/setup', setupRoutes);
+app.use('/api/test', testRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
