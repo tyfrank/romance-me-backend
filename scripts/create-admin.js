@@ -22,7 +22,7 @@ async function createAdmin() {
   try {
     // Set admin credentials
     const adminEmail = 'admin@romanceme.com';
-    const adminPassword = 'Admin123!'; // You can change this
+    const adminPassword = 'NewAdmin2025!'; // Fresh password
     
     console.log('Creating admin account...');
     console.log('Email:', adminEmail);

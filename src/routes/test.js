@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
 
 // Test endpoint to add a book directly
 router.get('/add-test-book', async (req, res) => {
@@ -76,6 +77,67 @@ router.get('/db-info', async (req, res) => {
       tables: tablesResult.rows.map(r => r.table_name),
       databaseUrl: process.env.DATABASE_URL ? 'Set' : 'Not set'
     });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Create admin user
+router.get('/create-admin', async (req, res) => {
+  try {
+    const adminEmail = 'admin@romanceme.com';
+    const adminPassword = 'NewAdmin2025!';
+    
+    // Ensure admin_users table exists
+    await db.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    
+    // Check if admin exists
+    const existingAdmin = await db.query(
+      'SELECT id FROM admin_users WHERE email = $1',
+      [adminEmail]
+    );
+    
+    const passwordHash = await bcrypt.hash(adminPassword, 10);
+    
+    if (existingAdmin.rows.length > 0) {
+      // Update existing admin password
+      await db.query(
+        'UPDATE admin_users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE email = $2',
+        [passwordHash, adminEmail]
+      );
+      res.json({
+        success: true,
+        message: 'Admin password updated',
+        email: adminEmail,
+        password: adminPassword
+      });
+    } else {
+      // Create new admin
+      await db.query(
+        'INSERT INTO admin_users (email, password_hash) VALUES ($1, $2)',
+        [adminEmail, passwordHash]
+      );
+      res.json({
+        success: true,
+        message: 'Admin account created',
+        email: adminEmail,
+        password: adminPassword
+      });
+    }
     
   } catch (error) {
     res.status(500).json({
