@@ -4,12 +4,12 @@ const bookController = require('../controllers/bookController');
 const monetizationController = require('../controllers/monetizationController');
 const { requireAuth, requireAge18 } = require('../middleware/auth');
 
-// Browsing routes - temporarily no auth for debugging
+// All book routes require authentication
+router.use(requireAuth);
+
+// Browsing routes - no age verification needed
 router.get('/', bookController.getBooks);
 router.get('/:id', bookController.getBookById);
-
-// All other routes require authentication
-router.use(requireAuth);
 
 // Content access routes - require age verification
 router.get('/:bookId/chapters/:chapterNumber', requireAge18, bookController.getChapter);
