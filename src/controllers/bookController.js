@@ -206,10 +206,14 @@ const getBooks = async (req, res) => {
       [limit, offset]
     );
     
+    console.log('📚 Books query returned:', booksResult.rows.length, 'books');
+    
     // Get total count
     const countResult = await db.query(
       'SELECT COUNT(*) FROM books WHERE is_published = true'
     );
+    
+    console.log('📊 Total published books:', countResult.rows[0].count);
     
     // Get user's reading progress for each book
     let booksWithProgress = booksResult.rows;
@@ -232,6 +236,8 @@ const getBooks = async (req, res) => {
         userProgress: progressMap[book.id] || null
       }));
     }
+    
+    console.log('✅ Sending response with', booksWithProgress.length, 'books');
     
     res.json({
       success: true,
