@@ -9,8 +9,6 @@ const storyRoutes = require('./routes/stories');
 const userRoutes = require('./routes/users');
 const bookRoutes = require('./routes/books');
 const adminRoutes = require('./routes/admin');
-const rewardsRoutes = require('./routes/rewards');
-const paymentRoutes = require('./routes/payments');
 const setupRoutes = require('./routes/setup');
 const testRoutes = require('./routes/test');
 
@@ -66,8 +64,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/books', bookRoutes);
-app.use('/api/rewards', rewardsRoutes);
-app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/setup', setupRoutes);
 app.use('/api/test', testRoutes);
