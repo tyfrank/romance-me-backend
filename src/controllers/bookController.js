@@ -23,12 +23,12 @@ const personalizeContent = (content, userData) => {
       const descriptions = {
         'fair': 'porcelain',
         'light': 'fair',
-        'medium': 'warm',
+        'medium': 'caramel',
         'olive': 'golden',
         'dark': 'rich',
         'deep': 'deep ebony'
       };
-      return descriptions[tone?.toLowerCase()] || 'warm';
+      return descriptions[tone?.toLowerCase()] || 'caramel';
     };
 
     const getNaturalBuild = (build) => {
