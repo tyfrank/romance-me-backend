@@ -1,4 +1,3 @@
-
 const { stripe, COIN_PACKAGES, SUBSCRIPTION_PLANS } = require('../config/stripe');
 const db = require('../config/database');
 
