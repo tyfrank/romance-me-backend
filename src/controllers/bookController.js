@@ -154,62 +154,6 @@ const getBooks = async (req, res) => {
   console.log('Query params:', req.query);
   
   try {
-    // Ensure books tables exist
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS books (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        title VARCHAR(255) NOT NULL,
-        description TEXT,
-        synopsis TEXT,
-        author VARCHAR(255),
-        genre VARCHAR(100),
-        content_rating VARCHAR(20) DEFAULT 'General',
-        total_chapters INTEGER DEFAULT 0,
-        word_count INTEGER DEFAULT 0,
-        reading_time_minutes INTEGER DEFAULT 0,
-        cover_image_url TEXT,
-        status VARCHAR(20) DEFAULT 'draft',
-        is_published BOOLEAN DEFAULT false,
-        is_featured BOOLEAN DEFAULT false,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS book_chapters (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        book_id UUID NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-        chapter_number INTEGER NOT NULL,
-        title VARCHAR(255),
-        content JSONB NOT NULL,
-        word_count INTEGER DEFAULT 0,
-        reading_time_minutes INTEGER DEFAULT 0,
-        is_published BOOLEAN DEFAULT false,
-        unlock_type VARCHAR(20) DEFAULT 'free',
-        coin_cost INTEGER DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(book_id, chapter_number)
-      );
-    `);
-
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS user_reading_progress (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        book_id UUID NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-        current_chapter_number INTEGER DEFAULT 1,
-        total_chapters_read INTEGER DEFAULT 0,
-        progress_percentage DECIMAL(5,2) DEFAULT 0.00,
-        last_read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        completed_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id, book_id)
-      );
-    `);
-    
     // Get published books
     const booksResult = await db.query(
       `SELECT id, title, description, synopsis, author, genre, content_rating, 
