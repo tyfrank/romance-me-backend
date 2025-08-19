@@ -160,7 +160,7 @@ const getBooks = async (req, res) => {
               total_chapters, word_count, reading_time_minutes, cover_image_url, status
        FROM books 
        WHERE is_published = true 
-       ORDER BY is_featured DESC, created_at DESC 
+       ORDER BY created_at DESC 
        LIMIT $1 OFFSET $2`,
       [limit, offset]
     );
