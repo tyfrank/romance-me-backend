@@ -2,6 +2,34 @@ const db = require('../config/database');
 
 const getRewardsStatus = async (req, res) => {
   try {
+    // Ensure rewards tables exist
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS user_rewards (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        total_coins INTEGER DEFAULT 0,
+        total_coins_earned INTEGER DEFAULT 0,
+        current_streak INTEGER DEFAULT 0,
+        longest_streak INTEGER DEFAULT 0,
+        last_check_in TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id)
+      );
+    `);
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS check_in_history (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        check_in_date DATE NOT NULL,
+        coins_earned INTEGER DEFAULT 0,
+        streak_day INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, check_in_date)
+      );
+    `);
+
     // Get user rewards
     const rewardsResult = await db.query(
       `SELECT * FROM user_rewards WHERE user_id = $1`,
