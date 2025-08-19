@@ -1,4 +1,4 @@
-// Payment fix for Railway deployment
+
 const { stripe, COIN_PACKAGES, SUBSCRIPTION_PLANS } = require('../config/stripe');
 const db = require('../config/database');
 
