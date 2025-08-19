@@ -16,9 +16,59 @@ const generateAdminToken = (adminId) => {
 };
 
 const adminLogin = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, email } = req.body;
   
   try {
+    // Ensure admin tables exist
+    await db.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+    
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        username VARCHAR(50) UNIQUE NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        role VARCHAR(20) DEFAULT 'admin',
+        is_active BOOLEAN DEFAULT true,
+        last_login TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS admin_sessions (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        admin_id UUID NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+        token_hash VARCHAR(255) UNIQUE NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        ip_address INET,
+        user_agent TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS admin_analytics (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        event_type VARCHAR(50) NOT NULL,
+        event_data JSONB DEFAULT '{}',
+        admin_id UUID REFERENCES admin_users(id),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create default admin user if none exists
+    const adminExists = await db.query('SELECT COUNT(*) FROM admin_users');
+    if (parseInt(adminExists.rows[0].count) === 0) {
+      const hashedPassword = await bcrypt.hash('SecureAdmin2024!', 10);
+      await db.query(`
+        INSERT INTO admin_users (username, email, password_hash, role) 
+        VALUES ($1, $2, $3, $4)`,
+        ['admin', 'admin@romanceme.com', hashedPassword, 'super_admin']
+      );
+    }
+    
     // Get admin user
     const adminResult = await db.query(
       `SELECT id, username, email, password_hash, role, is_active 
