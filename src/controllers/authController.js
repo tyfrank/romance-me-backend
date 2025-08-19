@@ -150,6 +150,8 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   
+  console.log('🔐 Login attempt for:', email);
+  
   try {
     // Get user with profile
     const userResult = await db.query(
@@ -160,7 +162,10 @@ const login = async (req, res) => {
       [email]
     );
     
+    console.log('👤 User query result:', userResult.rows.length);
+    
     if (userResult.rows.length === 0) {
+      console.log('❌ User not found');
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
@@ -168,11 +173,14 @@ const login = async (req, res) => {
     }
     
     const user = userResult.rows[0];
+    console.log('✅ User found:', user.email);
     
     // Verify password
     const passwordValid = await bcrypt.compare(password, user.password_hash);
+    console.log('🔑 Password valid:', passwordValid);
     
     if (!passwordValid) {
+      console.log('❌ Invalid password');
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'

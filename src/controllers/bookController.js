@@ -149,9 +149,10 @@ const getBooks = async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const offset = parseInt(req.query.offset) || 0;
   
-  console.log('GET /books called');
-  console.log('User:', req.user);
-  console.log('Query params:', req.query);
+  console.log('🔍 GET /books called');
+  console.log('👤 User:', req.user);
+  console.log('📋 Query params:', req.query);
+  console.log('🔐 Auth header:', req.headers.authorization ? 'Present' : 'Missing');
   
   try {
     // Ensure books tables exist
