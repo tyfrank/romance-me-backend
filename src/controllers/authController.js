@@ -19,6 +19,46 @@ const register = async (req, res) => {
   try {
     await client.query('BEGIN');
     
+    // Ensure core tables exist
+    await client.query(`
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    `);
+    
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        birth_date DATE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS user_profiles (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        first_name VARCHAR(100),
+        last_name VARCHAR(100),
+        display_name VARCHAR(100),
+        hair_color VARCHAR(50),
+        hair_length VARCHAR(50),
+        hair_type VARCHAR(50),
+        eye_color VARCHAR(50),
+        height VARCHAR(20),
+        build VARCHAR(50),
+        skin_tone VARCHAR(50),
+        style_preference VARCHAR(100),
+        favorite_setting VARCHAR(100),
+        profile_completed BOOLEAN DEFAULT false,
+        preferences JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id)
+      );
+    `);
+    
     // Check if user already exists
     const existingUser = await client.query(
       'SELECT id FROM users WHERE email = $1',
