@@ -255,7 +255,8 @@ const createBook = async (req, res) => {
     genre,
     contentRating,
     status,
-    fullText
+    fullText,
+    isPublished
   } = bookData;
   
   const client = await db.pool.connect();
@@ -301,7 +302,7 @@ const createBook = async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
        RETURNING id`,
       [title, description, synopsis, author, genre, contentRating, 
-       status || 'ongoing', coverImageUrl, chapters.length, totalWordCount, totalReadingTime, false]
+       status || 'ongoing', coverImageUrl, chapters.length, totalWordCount, totalReadingTime, Boolean(isPublished)]
     );
     
     const bookId = bookResult.rows[0].id;
