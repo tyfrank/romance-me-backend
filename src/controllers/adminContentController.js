@@ -157,7 +157,7 @@ const getAllBooks = async (req, res) => {
              COUNT(rp.id) as readers_count
       FROM books b
       LEFT JOIN chapters c ON b.id = c.book_id
-      LEFT JOIN reading_progress rp ON b.id = rp.book_id
+      LEFT JOIN user_reading_progress rp ON b.id = rp.book_id
       GROUP BY b.id
       ORDER BY b.created_at DESC
     `);
@@ -244,6 +244,24 @@ const createBook = async (req, res) => {
   
   try {
     await client.query('BEGIN');
+    
+    // Ensure chapters table exists
+    await client.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS chapters (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        book_id UUID NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+        chapter_number INTEGER NOT NULL,
+        title VARCHAR(255),
+        content JSONB,
+        word_count INTEGER DEFAULT 0,
+        reading_time_minutes INTEGER DEFAULT 0,
+        is_published BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(book_id, chapter_number)
+      )
+    `);
     
     // Auto-split the full text into chapters
     const chapters = autoSplitChapters(fullText);
