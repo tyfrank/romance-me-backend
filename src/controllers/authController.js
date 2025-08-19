@@ -59,6 +59,17 @@ const register = async (req, res) => {
       );
     `);
     
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS user_sessions (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token_hash VARCHAR(255) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(token_hash)
+      );
+    `);
+    
     // Check if user already exists
     const existingUser = await client.query(
       'SELECT id FROM users WHERE email = $1',
