@@ -147,4 +147,53 @@ router.get('/create-admin', async (req, res) => {
   }
 });
 
+// Delete test books
+router.get('/delete-test-books', async (req, res) => {
+  try {
+    // Find all test books first
+    const testBooksResult = await db.query(`
+      SELECT id, title, author 
+      FROM books 
+      WHERE title LIKE '%Test%' 
+         OR title LIKE '%Debug%'
+         OR title = 'Your Book Title'
+         OR title = 'gfdgdfs'
+    `);
+    
+    if (testBooksResult.rows.length === 0) {
+      return res.json({
+        success: true,
+        message: 'No test books found to delete',
+        deletedCount: 0
+      });
+    }
+    
+    // Delete test books (will cascade to chapters and reading progress)
+    const deleteResult = await db.query(`
+      DELETE FROM books 
+      WHERE title LIKE '%Test%' 
+         OR title LIKE '%Debug%'
+         OR title = 'Your Book Title'
+         OR title = 'gfdgdfs'
+      RETURNING title
+    `);
+    
+    // Get remaining books
+    const remainingBooks = await db.query('SELECT COUNT(*) as count FROM books');
+    
+    res.json({
+      success: true,
+      message: `Deleted ${deleteResult.rows.length} test books`,
+      deletedBooks: deleteResult.rows.map(b => b.title),
+      remainingBooksCount: remainingBooks.rows[0].count
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
