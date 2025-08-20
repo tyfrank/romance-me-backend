@@ -385,9 +385,13 @@ const updateBook = async (req, res) => {
     // Handle cover image upload if present
     let coverImageUrl = null;
     if (req.file) {
+      console.log('📷 Cover image uploaded:', req.file.filename);
       // In a real app, you'd upload to cloud storage (AWS S3, etc.)
       // For now, we'll just store the filename
       coverImageUrl = `/uploads/covers/${req.file.filename}`;
+      console.log('📷 Cover URL set to:', coverImageUrl);
+    } else {
+      console.log('📷 No cover image file received');
     }
     
     // Build update query dynamically based on what fields are provided
@@ -450,6 +454,7 @@ const updateBook = async (req, res) => {
     }
     
     if (coverImageUrl) {
+      console.log('📷 Adding cover URL to database update:', coverImageUrl);
       updateQuery += `, cover_image_url = $${paramCount}`;
       updateValues.push(coverImageUrl);
       paramCount++;
