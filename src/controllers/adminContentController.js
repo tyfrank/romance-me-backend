@@ -291,8 +291,10 @@ const createBook = async (req, res) => {
     
     // Handle cover image upload if present
     let coverImageUrl = null;
-    if (req.file) {
-      coverImageUrl = `/uploads/covers/${req.file.filename}`;
+    if (req.file && req.file.path) {
+      // Cloudinary upload successful
+      coverImageUrl = req.file.path;
+      console.log('☁️ Cover uploaded to Cloudinary:', coverImageUrl);
     }
     
     // Create book
@@ -383,17 +385,15 @@ const updateBook = async (req, res) => {
   } = updateData;
   
   try {
-    // Handle cover image - prioritize external URL over file upload
+    // Handle cover image - prioritize Cloudinary upload, then external URL
     let finalCoverImageUrl = null;
-    if (coverImageUrl && coverImageUrl.trim()) {
+    if (req.file && req.file.path) {
+      // Cloudinary upload successful - use the secure URL
+      console.log('☁️ Cover uploaded to Cloudinary:', req.file.path);
+      finalCoverImageUrl = req.file.path; // Cloudinary returns the URL in the path field
+    } else if (coverImageUrl && coverImageUrl.trim()) {
       console.log('📷 Using external cover URL:', coverImageUrl);
       finalCoverImageUrl = coverImageUrl;
-    } else if (req.file) {
-      console.log('📷 Cover image uploaded:', req.file.filename);
-      // In a real app, you'd upload to cloud storage (AWS S3, etc.)
-      // For now, we'll just store the filename (won't persist on Railway)
-      finalCoverImageUrl = `/uploads/covers/${req.file.filename}`;
-      console.log('📷 Cover URL set to:', finalCoverImageUrl);
     } else {
       console.log('📷 No cover image file or URL received');
     }
