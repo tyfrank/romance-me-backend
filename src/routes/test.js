@@ -57,6 +57,44 @@ router.get('/add-test-book', async (req, res) => {
   }
 });
 
+// Check book chapters
+router.get('/check-chapters', async (req, res) => {
+  try {
+    const booksResult = await db.query(`
+      SELECT 
+        b.id,
+        b.title,
+        b.total_chapters,
+        COUNT(c.id) as actual_chapter_count
+      FROM books b
+      LEFT JOIN chapters c ON b.id = c.book_id
+      GROUP BY b.id
+      ORDER BY b.created_at
+    `);
+    
+    const booksWithNoChapters = booksResult.rows.filter(b => b.actual_chapter_count === 0);
+    
+    res.json({
+      success: true,
+      totalBooks: booksResult.rows.length,
+      booksWithChapters: booksResult.rows.filter(b => b.actual_chapter_count > 0).length,
+      booksWithNoChapters: booksWithNoChapters.length,
+      details: booksResult.rows.map(b => ({
+        title: b.title,
+        expectedChapters: b.total_chapters,
+        actualChapters: parseInt(b.actual_chapter_count),
+        hasChapters: b.actual_chapter_count > 0
+      }))
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Get database info
 router.get('/db-info', async (req, res) => {
   try {
