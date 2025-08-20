@@ -378,20 +378,24 @@ const updateBook = async (req, res) => {
     contentRating,
     status,
     isPublished,
-    isFeatured
+    isFeatured,
+    coverImageUrl
   } = updateData;
   
   try {
-    // Handle cover image upload if present
-    let coverImageUrl = null;
-    if (req.file) {
+    // Handle cover image - prioritize external URL over file upload
+    let finalCoverImageUrl = null;
+    if (coverImageUrl && coverImageUrl.trim()) {
+      console.log('📷 Using external cover URL:', coverImageUrl);
+      finalCoverImageUrl = coverImageUrl;
+    } else if (req.file) {
       console.log('📷 Cover image uploaded:', req.file.filename);
       // In a real app, you'd upload to cloud storage (AWS S3, etc.)
-      // For now, we'll just store the filename
-      coverImageUrl = `/uploads/covers/${req.file.filename}`;
-      console.log('📷 Cover URL set to:', coverImageUrl);
+      // For now, we'll just store the filename (won't persist on Railway)
+      finalCoverImageUrl = `/uploads/covers/${req.file.filename}`;
+      console.log('📷 Cover URL set to:', finalCoverImageUrl);
     } else {
-      console.log('📷 No cover image file received');
+      console.log('📷 No cover image file or URL received');
     }
     
     // Build update query dynamically based on what fields are provided
@@ -453,10 +457,10 @@ const updateBook = async (req, res) => {
       paramCount++;
     }
     
-    if (coverImageUrl) {
-      console.log('📷 Adding cover URL to database update:', coverImageUrl);
+    if (finalCoverImageUrl) {
+      console.log('📷 Adding cover URL to database update:', finalCoverImageUrl);
       updateQuery += `, cover_image_url = $${paramCount}`;
-      updateValues.push(coverImageUrl);
+      updateValues.push(finalCoverImageUrl);
       paramCount++;
     }
     
