@@ -283,7 +283,7 @@ const getBookById = async (req, res) => {
     if (req.user?.id) {
       const progressResult = await db.query(
         `SELECT current_chapter_number, total_chapters_read, progress_percentage,
-                last_read_at, started_at, completed_at
+                last_read_at, completed_at
          FROM user_reading_progress 
          WHERE user_id = $1 AND book_id = $2`,
         [req.user.id, id]
