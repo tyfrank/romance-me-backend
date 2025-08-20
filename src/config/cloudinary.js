@@ -5,6 +5,12 @@ const multer = require('multer');
 // Configure Cloudinary
 // You'll need to sign up for a free account at cloudinary.com
 // Then add these to your Railway environment variables
+console.log('🔧 Configuring Cloudinary with:', {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'demo',
+  api_key: process.env.CLOUDINARY_API_KEY ? `${process.env.CLOUDINARY_API_KEY.substring(0, 4)}***` : 'demo',
+  api_secret: process.env.CLOUDINARY_API_SECRET ? 'Set (hidden)' : 'demo'
+});
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'demo', // Using 'demo' for testing
   api_key: process.env.CLOUDINARY_API_KEY || '874837483274837', // Demo key

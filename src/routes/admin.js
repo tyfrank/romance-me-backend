@@ -17,7 +17,12 @@ router.get('/dashboard/stats', requireAdminAuth, adminContentController.getDashb
 router.get('/books', requireAdminAuth, adminContentController.getAllBooks);
 router.get('/books/:id', requireAdminAuth, adminContentController.getBook);
 router.post('/books', requireAdminAuth, uploadToCloud.single('coverImage'), adminContentController.createBook);
-router.put('/books/:id', requireAdminAuth, uploadToCloud.single('coverImage'), adminContentController.updateBook);
+router.put('/books/:id', requireAdminAuth, uploadToCloud.single('coverImage'), (req, res, next) => {
+  console.log(`🔄 PUT /books/${req.params.id} - Admin update request received`);
+  console.log('📄 Content-Type:', req.headers['content-type']);
+  console.log('📁 Has file in request:', !!req.file);
+  next();
+}, adminContentController.updateBook);
 router.delete('/books/:id', requireAdminAuth, adminContentController.deleteBook);
 
 // Chapter management routes

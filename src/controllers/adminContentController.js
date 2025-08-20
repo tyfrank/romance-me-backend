@@ -387,10 +387,25 @@ const updateBook = async (req, res) => {
   try {
     // Handle cover image - prioritize Cloudinary upload, then external URL
     let finalCoverImageUrl = null;
+    
+    console.log('📸 Upload attempt - File received:', !!req.file);
+    console.log('📸 File details:', req.file ? {
+      fieldname: req.file.fieldname,
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      path: req.file.path || 'NO PATH',
+      filename: req.file.filename || 'NO FILENAME'
+    } : 'No file');
+    
     if (req.file && req.file.path) {
       // Cloudinary upload successful - use the secure URL
       console.log('☁️ Cover uploaded to Cloudinary:', req.file.path);
       finalCoverImageUrl = req.file.path; // Cloudinary returns the URL in the path field
+    } else if (req.file && req.file.filename) {
+      // Fallback for local storage (shouldn't happen with Cloudinary)
+      console.log('📁 File uploaded locally (not Cloudinary):', req.file.filename);
+      finalCoverImageUrl = `/uploads/covers/${req.file.filename}`;
     } else if (coverImageUrl && coverImageUrl.trim()) {
       console.log('📷 Using external cover URL:', coverImageUrl);
       finalCoverImageUrl = coverImageUrl;
