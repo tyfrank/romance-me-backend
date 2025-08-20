@@ -13,6 +13,7 @@ const setupRoutes = require('./routes/setup');
 const testRoutes = require('./routes/test');
 const rewardsRoutes = require('./routes/rewards');
 const paymentsRoutes = require('./routes/payments');
+const testCloudinaryRoutes = require('./routes/test-cloudinary');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -71,6 +72,7 @@ app.use('/api/setup', setupRoutes);
 app.use('/api/test', testRoutes);
 app.use('/api/rewards', rewardsRoutes);
 app.use('/api/payments', paymentsRoutes);
+app.use('/api/test-cloudinary', testCloudinaryRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
