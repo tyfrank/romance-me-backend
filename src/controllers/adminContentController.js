@@ -1,9 +1,25 @@
 const db = require('../config/database');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
+const { parseChapters, detectFormat } = require('../utils/chapterParser');
 
 // Auto-split text into chapters based on patterns
 const autoSplitChapters = (fullText) => {
+  // Use the new improved parser first
+  const chapters = parseChapters(fullText, { 
+    minChapterLength: 100,
+    debug: true 
+  });
+  
+  if (chapters.length > 0) {
+    console.log(`✅ Detected ${chapters.length} chapters using improved parser`);
+    const formats = detectFormat(fullText);
+    console.log(`   Format(s) detected: ${formats.join(', ')}`);
+    return chapters;
+  }
+  
+  // Fallback to old logic
+  console.log('⚠️ Using legacy chapter detection');
   // Common chapter markers
   const chapterPatterns = [
     /Chapter\s+\d+/gi,
@@ -13,7 +29,7 @@ const autoSplitChapters = (fullText) => {
     /^\d+$/gm
   ];
   
-  let chapters = [];
+  let legacyChapters = [];
   let currentChapter = '';
   let chapterNumber = 1;
   
@@ -26,7 +42,7 @@ const autoSplitChapters = (fullText) => {
       for (let i = 1; i < splits.length; i++) {
         const content = splits[i].trim();
         if (content.length > 100) { // Minimum chapter length
-          chapters.push({
+          legacyChapters.push({
             number: i,
             title: `Chapter ${i}`,
             content: content,
@@ -39,7 +55,7 @@ const autoSplitChapters = (fullText) => {
   }
   
   // Fallback: split by word count if no patterns found
-  if (chapters.length === 0) {
+  if (legacyChapters.length === 0) {
     const words = fullText.split(/\s+/);
     const wordsPerChapter = Math.ceil(words.length / 12); // Aim for 12 chapters
     
@@ -49,7 +65,7 @@ const autoSplitChapters = (fullText) => {
       const chapterWords = words.slice(start, end);
       
       if (chapterWords.length > 0) {
-        chapters.push({
+        legacyChapters.push({
           number: i + 1,
           title: `Chapter ${i + 1}`,
           content: chapterWords.join(' '),
@@ -59,7 +75,7 @@ const autoSplitChapters = (fullText) => {
     }
   }
   
-  return chapters;
+  return legacyChapters;
 };
 
 // Convert text to structured content format
