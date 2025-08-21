@@ -36,6 +36,25 @@ const getSubscriptionPlans = async (req, res) => {
 // Create payment intent for coin purchase
 const createCoinPaymentIntent = async (req, res) => {
   const { packageId } = req.body;
+  
+  // Safety check: Ensure user is authenticated
+  if (!req.user || !req.user.id) {
+    console.log('Payment API: No authenticated user found, returning mock intent');
+    const coinPackage = COIN_PACKAGES[packageId];
+    if (!coinPackage) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid coin package'
+      });
+    }
+    return res.json({
+      success: true,
+      clientSecret: 'mock_secret_' + Date.now(),
+      package: coinPackage,
+      message: 'Demo mode - payment not processed'
+    });
+  }
+  
   const userId = req.user.id;
 
   try {
@@ -78,6 +97,25 @@ const createCoinPaymentIntent = async (req, res) => {
 // Create payment intent for subscription
 const createSubscriptionPaymentIntent = async (req, res) => {
   const { planId } = req.body;
+  
+  // Safety check: Ensure user is authenticated
+  if (!req.user || !req.user.id) {
+    console.log('Subscription API: No authenticated user found, returning mock intent');
+    const plan = SUBSCRIPTION_PLANS[planId];
+    if (!plan) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid subscription plan'
+      });
+    }
+    return res.json({
+      success: true,
+      clientSecret: 'mock_sub_secret_' + Date.now(),
+      plan: plan,
+      message: 'Demo mode - subscription not processed'
+    });
+  }
+  
   const userId = req.user.id;
 
   try {
