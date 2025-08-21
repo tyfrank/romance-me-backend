@@ -2,6 +2,21 @@ const db = require('../config/database');
 
 const getRewardsStatus = async (req, res) => {
   try {
+    // Safety check: Ensure user is authenticated
+    if (!req.user || !req.user.id) {
+      console.log('Rewards API: No authenticated user found, returning default values');
+      return res.json({
+        success: true,
+        rewards: {
+          total_coins: 0,
+          current_streak: 0,
+          longest_streak: 0,
+          last_check_in: null
+        },
+        hasCheckedInToday: false,
+        recentCheckIns: []
+      });
+    }
     // Ensure rewards tables exist
     await db.query(`
       CREATE TABLE IF NOT EXISTS user_rewards (

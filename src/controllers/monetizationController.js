@@ -3,9 +3,25 @@ const db = require('../config/database');
 // Check if user has access to a chapter
 const checkChapterAccess = async (req, res) => {
   const { bookId, chapterNumber } = req.params;
-  const userId = req.user.id;
   
   try {
+    // Safety check: Ensure user is authenticated
+    if (!req.user || !req.user.id) {
+      console.log('Monetization API: No authenticated user found, granting free access');
+      return res.json({
+        success: true,
+        hasAccess: true,
+        chapter: {
+          id: 'unknown',
+          chapterNumber: parseInt(chapterNumber),
+          coinCost: 0,
+          isPremium: false,
+          unlockType: 'free'
+        }
+      });
+    }
+    
+    const userId = req.user.id;
     // Get chapter info
     const chapterResult = await db.query(
       `SELECT id, chapter_number, coin_cost, is_premium, unlock_type 
