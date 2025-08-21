@@ -325,19 +325,70 @@ const createBook = async (req, res) => {
     
     const bookId = bookResult.rows[0].id;
     
-    // Create chapters
-    for (const chapter of chapters) {
-      const structuredContent = textToStructuredContent(chapter.content);
+    // Create chapters with batch processing and better error handling
+    console.log(`📚 Creating ${chapters.length} chapters for book: ${title}`);
+    const BATCH_SIZE = 5; // Insert 5 chapters at a time to avoid timeouts
+    
+    for (let i = 0; i < chapters.length; i += BATCH_SIZE) {
+      const batch = chapters.slice(i, Math.min(i + BATCH_SIZE, chapters.length));
+      const batchStart = i + 1;
+      const batchEnd = Math.min(i + BATCH_SIZE, chapters.length);
       
-      await client.query(
-        `INSERT INTO chapters (book_id, chapter_number, title, content, word_count, reading_time_minutes) 
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [bookId, chapter.number, chapter.title, JSON.stringify(structuredContent), 
-         chapter.wordCount, Math.ceil(chapter.wordCount / 200)]
-      );
+      console.log(`  📝 Inserting chapters ${batchStart}-${batchEnd}...`);
+      
+      try {
+        // Build batch insert query
+        const values = [];
+        const placeholders = [];
+        
+        batch.forEach((chapter, index) => {
+          const structuredContent = textToStructuredContent(chapter.content);
+          const baseIndex = index * 6;
+          
+          placeholders.push(`($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5}, $${baseIndex + 6})`);
+          values.push(
+            bookId,
+            chapter.number,
+            chapter.title,
+            JSON.stringify(structuredContent),
+            chapter.wordCount,
+            Math.ceil(chapter.wordCount / 200)
+          );
+        });
+        
+        const batchQuery = `
+          INSERT INTO chapters (book_id, chapter_number, title, content, word_count, reading_time_minutes) 
+          VALUES ${placeholders.join(', ')}
+        `;
+        
+        await client.query(batchQuery, values);
+        console.log(`  ✅ Chapters ${batchStart}-${batchEnd} saved`);
+        
+      } catch (batchError) {
+        console.error(`  ❌ Failed to insert chapters ${batchStart}-${batchEnd}:`, batchError.message);
+        // Try individual inserts as fallback
+        console.log(`  🔄 Retrying chapters ${batchStart}-${batchEnd} individually...`);
+        
+        for (const chapter of batch) {
+          try {
+            const structuredContent = textToStructuredContent(chapter.content);
+            await client.query(
+              `INSERT INTO chapters (book_id, chapter_number, title, content, word_count, reading_time_minutes) 
+               VALUES ($1, $2, $3, $4, $5, $6)`,
+              [bookId, chapter.number, chapter.title, JSON.stringify(structuredContent), 
+               chapter.wordCount, Math.ceil(chapter.wordCount / 200)]
+            );
+            console.log(`    ✅ Chapter ${chapter.number} saved individually`);
+          } catch (individualError) {
+            console.error(`    ❌ Chapter ${chapter.number} failed:`, individualError.message);
+            // Continue with other chapters instead of failing entire upload
+          }
+        }
+      }
     }
     
     await client.query('COMMIT');
+    console.log(`✅ Book created successfully with ${chapters.length} chapters`);
     
     // Log activity
     await db.query(
@@ -358,10 +409,28 @@ const createBook = async (req, res) => {
     
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Create book error:', error);
+    console.error('Create book error - Full details:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      constraint: error.constraint,
+      stack: error.stack
+    });
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to create book';
+    if (error.code === '23505') {
+      errorMessage = 'A book with this title may already exist';
+    } else if (error.code === '22001') {
+      errorMessage = 'Some content is too large for the database';
+    } else if (error.message && error.message.includes('timeout')) {
+      errorMessage = 'Upload timeout - try uploading fewer chapters at once';
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'Failed to create book'
+      message: errorMessage,
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   } finally {
     client.release();

@@ -7,7 +7,9 @@ const poolConfig = process.env.DATABASE_URL ? {
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 30000,    // Increased from 2s to 30s for Railway
+  statement_timeout: 120000,          // Allow 2 minutes for complex queries
+  query_timeout: 120000,              // Additional timeout for large uploads
 } : {
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 5432,
@@ -16,7 +18,9 @@ const poolConfig = process.env.DATABASE_URL ? {
   password: process.env.DB_PASSWORD,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000,
+  statement_timeout: 60000,
+  query_timeout: 60000,
 };
 
 const pool = new Pool(poolConfig);
