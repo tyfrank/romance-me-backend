@@ -295,64 +295,6 @@ const processCoinPurchase = async (userId, packageId, coins, paymentIntent) => {
   try {
     await client.query('BEGIN');
 
-    // Ensure payment tables exist
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS user_rewards (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        total_coins INTEGER DEFAULT 0,
-        total_coins_earned INTEGER DEFAULT 0,
-        current_streak INTEGER DEFAULT 0,
-        longest_streak INTEGER DEFAULT 0,
-        last_check_in TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id)
-      );
-    `);
-
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS reward_transactions (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        transaction_type VARCHAR(20) NOT NULL,
-        amount INTEGER NOT NULL,
-        reason VARCHAR(255),
-        reference_type VARCHAR(50),
-        reference_id VARCHAR(255),
-        balance_after INTEGER,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS user_subscriptions (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        subscription_type VARCHAR(20) NOT NULL,
-        status VARCHAR(20) DEFAULT 'active',
-        price_paid DECIMAL(10,2),
-        payment_method VARCHAR(50),
-        payment_id VARCHAR(255),
-        expires_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS user_chapter_unlocks (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        book_id UUID NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-        chapter_number INTEGER NOT NULL,
-        unlock_method VARCHAR(20) NOT NULL,
-        coins_spent INTEGER DEFAULT 0,
-        unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id, book_id, chapter_number)
-      );
-    `);
-
     // Get current user rewards
     const rewardsResult = await client.query(
       'SELECT * FROM user_rewards WHERE user_id = $1 FOR UPDATE',
@@ -367,7 +309,7 @@ const processCoinPurchase = async (userId, packageId, coins, paymentIntent) => {
       // Create rewards record if doesn't exist
       console.log(`Creating new rewards record for user ${userId}`);
       await client.query(
-        'INSERT INTO user_rewards (user_id) VALUES ($1)',
+        'INSERT INTO user_rewards (user_id, total_coins) VALUES ($1, 0)',
         [userId]
       );
       console.log(`New rewards record created for user ${userId}`);
@@ -376,41 +318,43 @@ const processCoinPurchase = async (userId, packageId, coins, paymentIntent) => {
     const newTotal = currentCoins + coins;
 
     // Update user coins
-    try {
-      const updateResult = await client.query(
-        `UPDATE user_rewards 
-         SET total_coins = $1, 
-             total_coins_earned = total_coins_earned + $2,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE user_id = $3`,
-        [newTotal, coins, userId]
-      );
-      console.log(`Coins updated for user ${userId}: ${coins} coins added, new total: ${newTotal}. Rows affected: ${updateResult.rowCount}`);
-    } catch (updateError) {
-      console.error('Failed to update user coins:', updateError);
-      throw updateError; // Re-throw to rollback transaction
-    }
+    const updateResult = await client.query(
+      `UPDATE user_rewards 
+       SET total_coins = $1, 
+           total_coins_earned = total_coins_earned + $2,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE user_id = $3`,
+      [newTotal, coins, userId]
+    );
+    console.log(`Coins updated for user ${userId}: ${coins} coins added, new total: ${newTotal}. Rows affected: ${updateResult.rowCount}`);
 
-    // Record transaction (with error handling for missing tables)
-    try {
-      await client.query(
-        `INSERT INTO reward_transactions 
-         (user_id, transaction_type, amount, reason, reference_type, reference_id, balance_after)
-         VALUES ($1, 'purchased', $2, $3, 'stripe_payment', $4, $5)`,
-        [userId, coins, `Purchased ${COIN_PACKAGES[packageId]?.name || 'Coin Package'}`, paymentIntent.id, newTotal]
-      );
-    } catch (insertError) {
-      console.log('Transaction logging failed (table may not exist), but payment succeeded:', insertError.message);
-      // Continue with payment success even if transaction logging fails
-    }
-
+    // Commit the coin update immediately to ensure it persists
     await client.query('COMMIT');
+    console.log('Coin update committed successfully');
     
   } catch (error) {
     await client.query('ROLLBACK');
+    console.error('Coin purchase failed, rolling back:', error);
     throw error;
   } finally {
     client.release();
+  }
+  
+  // Try to log transaction (non-critical, outside main transaction)
+  const logClient = await db.getClient();
+  try {
+    await logClient.query(
+      `INSERT INTO reward_transactions 
+       (user_id, transaction_type, amount, reason, reference_type, reference_id, balance_after)
+       VALUES ($1, 'purchased', $2, $3, 'stripe_payment', $4, $5)`,
+      [userId, coins, `Purchased ${COIN_PACKAGES[packageId]?.name || 'Coin Package'}`, paymentIntent.id, currentCoins + coins]
+    );
+    console.log('Transaction logged successfully');
+  } catch (logError) {
+    console.log('Transaction logging failed (non-critical):', logError.message);
+    // This is non-critical, coins are already updated
+  } finally {
+    logClient.release();
   }
 };
 

@@ -2,9 +2,13 @@ const express = require('express');
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
 const { requireAuth } = require('../middleware/auth');
+const { paymentRequestSizeMonitor } = require('../middleware/requestSizeMonitor');
 
 // All payment routes require authentication
 router.use(requireAuth);
+
+// Apply request size monitoring to all payment routes
+router.use(paymentRequestSizeMonitor.monitorRequest());
 
 // Get available packages and plans
 router.get('/coins/packages', paymentController.getCoinPackages);
