@@ -13,7 +13,18 @@ try {
           client_secret: 'mock_secret_' + Date.now(),
           amount: options.amount,
           currency: options.currency,
-          status: 'requires_payment_method'
+          status: 'requires_payment_method',
+          metadata: options.metadata || {}
+        }),
+        retrieve: async (id) => ({
+          id: id,
+          status: 'succeeded',
+          metadata: {
+            type: 'coin_purchase',
+            user_id: '123',
+            package_id: 'small',
+            coins: '500'
+          }
         })
       },
       subscriptions: {
@@ -37,7 +48,17 @@ try {
   // Use mock Stripe for development
   stripe = {
     paymentIntents: {
-      create: async () => ({ client_secret: 'mock_secret' })
+      create: async () => ({ client_secret: 'mock_secret' }),
+      retrieve: async (id) => ({
+        id: id,
+        status: 'succeeded',
+        metadata: {
+          type: 'coin_purchase',
+          user_id: '123',
+          package_id: 'small',
+          coins: '500'
+        }
+      })
     }
   };
 }

@@ -226,3 +226,122 @@ Environment: development
 Stripe initialized with API key
 Server running on port 3001
 Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+Stripe initialized with API key
+Server running on port 3001
+Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+/Users/ryanmatsumoto/story-reader-app/backend/src/controllers/rewardsController.js:125
+  /*
+
+SyntaxError: Invalid or unexpected token
+    at wrapSafe (node:internal/modules/cjs/loader:1620:18)
+    at Module._compile (node:internal/modules/cjs/loader:1662:20)
+    at Object..js (node:internal/modules/cjs/loader:1820:10)
+    at Module.load (node:internal/modules/cjs/loader:1423:32)
+    at Function._load (node:internal/modules/cjs/loader:1246:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.require (node:internal/modules/cjs/loader:1445:12)
+    at require (node:internal/modules/helpers:135:16)
+    at Object.<anonymous> (/Users/ryanmatsumoto/story-reader-app/backend/src/routes/rewards.js:3:27)
+
+Node.js v22.18.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+Stripe initialized with API key
+Server running on port 3001
+Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+/Users/ryanmatsumoto/story-reader-app/backend/src/controllers/rewardsController.js:247
+  } catch (error) {
+    ^^^^^
+
+SyntaxError: Unexpected token 'catch'
+    at wrapSafe (node:internal/modules/cjs/loader:1620:18)
+    at Module._compile (node:internal/modules/cjs/loader:1662:20)
+    at Object..js (node:internal/modules/cjs/loader:1820:10)
+    at Module.load (node:internal/modules/cjs/loader:1423:32)
+    at Function._load (node:internal/modules/cjs/loader:1246:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.require (node:internal/modules/cjs/loader:1445:12)
+    at require (node:internal/modules/helpers:135:16)
+    at Object.<anonymous> (/Users/ryanmatsumoto/story-reader-app/backend/src/routes/rewards.js:3:27)
+
+Node.js v22.18.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+Stripe initialized with API key
+Server running on port 3001
+Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+Stripe initialized with API key
+Server running on port 3001
+Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+Stripe initialized with API key
+Server running on port 3001
+Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+Stripe initialized with API key
+Server running on port 3001
+Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+Stripe initialized with API key
+Server running on port 3001
+Environment: development
