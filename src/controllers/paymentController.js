@@ -205,6 +205,8 @@ const createSubscriptionPaymentIntent = async (req, res) => {
 const confirmPayment = async (req, res) => {
   const { paymentIntentId } = req.body;
   
+  console.log('Payment confirmation called with:', paymentIntentId);
+  
   // Safety check for mock payments
   if (!paymentIntentId || paymentIntentId.startsWith('mock_')) {
     console.log('Mock payment detected, simulating success');
@@ -243,6 +245,9 @@ const confirmPayment = async (req, res) => {
 
     const { type, user_id, package_id, plan_id, coins, interval } = paymentIntent.metadata || {};
 
+    console.log('Payment metadata:', paymentIntent.metadata);
+    console.log('Payment status:', paymentIntent.status);
+
     // Validate metadata exists
     if (!type || !user_id) {
       console.error('Invalid payment metadata:', paymentIntent.metadata);
@@ -254,8 +259,10 @@ const confirmPayment = async (req, res) => {
 
     // Process based on payment type
     if (type === 'coin_purchase') {
+      console.log('Processing coin purchase:', { user_id, package_id, coins });
       await processCoinPurchase(user_id, package_id, parseInt(coins), { id: paymentIntent.id });
     } else if (type === 'subscription') {
+      console.log('Processing subscription:', { user_id, plan_id, interval });
       await processSubscription(user_id, plan_id, interval, { id: paymentIntent.id });
     }
 
@@ -282,6 +289,7 @@ const confirmPayment = async (req, res) => {
 
 // Process coin purchase
 const processCoinPurchase = async (userId, packageId, coins, paymentIntent) => {
+  console.log('Starting coin purchase processing:', { userId, packageId, coins });
   const client = await db.getClient();
   
   try {
