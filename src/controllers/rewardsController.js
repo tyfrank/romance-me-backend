@@ -8,7 +8,7 @@ const getRewardsStatus = async (req, res) => {
       return res.json({
         success: true,
         rewards: {
-          total_coins: 0,
+          total_coins: 1010, // Consistent default balance
           current_streak: 0,
           longest_streak: 0,
           last_check_in: null
@@ -27,7 +27,7 @@ const getRewardsStatus = async (req, res) => {
       );
 
       const rewards = rewardsResult.rows[0] || {
-        total_coins: 0,
+        total_coins: 1010, // Match rewards page display
         current_streak: 0,
         longest_streak: 0,
         last_check_in: null
@@ -45,7 +45,7 @@ const getRewardsStatus = async (req, res) => {
       res.json({
         success: true,
         rewards: {
-          total_coins: 65,
+          total_coins: 1010, // Match rewards page display
           current_streak: 0,
           longest_streak: 0,
           last_check_in: null
