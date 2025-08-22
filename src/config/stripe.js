@@ -10,7 +10,8 @@ try {
     }
     
     // Initialize Stripe with production-ready configuration
-    stripe = require('stripe')(key, {
+    const Stripe = require('stripe');
+    stripe = new Stripe(key, {
       apiVersion: '2023-10-16', // Use stable API version
       maxNetworkRetries: 2, // Retry on network failures
       timeout: 20000, // 20 second timeout for production
