@@ -19,16 +19,14 @@ const setupRewardsTables = async () => {
       )
     `);
 
-    // Create check_in_history table
+    // Create check_in_history table (simplified structure)
     await db.query(`
       CREATE TABLE IF NOT EXISTS check_in_history (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         check_in_date DATE NOT NULL,
-        coins_earned INTEGER NOT NULL,
-        streak_day INTEGER NOT NULL,
-        bonus_coins INTEGER DEFAULT 0,
-        bonus_reason VARCHAR(255),
+        coins_earned INTEGER DEFAULT 0,
+        streak_day INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, check_in_date)
       )
