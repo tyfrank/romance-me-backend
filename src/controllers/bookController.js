@@ -11,6 +11,11 @@ const personalizeContent = (content, userData) => {
     // Helper functions for natural descriptions
     const getNaturalHairLength = (length) => {
       const descriptions = {
+        'pixie short': 'short',
+        'shoulder length': 'shoulder-length',
+        'long and flowing': 'long',
+        'waist-length': 'cascading',
+        // Fallback for simple values
         'short': 'short',
         'medium': 'shoulder-length', 
         'long': 'long',
@@ -21,6 +26,13 @@ const personalizeContent = (content, userData) => {
 
     const getNaturalSkinTone = (tone) => {
       const descriptions = {
+        'porcelain fair': 'porcelain',
+        'creamy light': 'fair',
+        'sun-kissed medium': 'caramel',
+        'warm olive': 'golden',
+        'rich dark': 'rich',
+        'deep ebony': 'deep ebony',
+        // Fallback for simple values
         'fair': 'porcelain',
         'light': 'fair',
         'medium': 'caramel',
@@ -33,6 +45,12 @@ const personalizeContent = (content, userData) => {
 
     const getNaturalBuild = (build) => {
       const descriptions = {
+        'gracefully slender': 'slender',
+        'athletically toned': 'athletic',
+        'curvaceous': 'curvaceous',
+        'voluptuous': 'voluptuous',
+        'strong and muscular': 'muscular',
+        // Fallback for simple values
         'slim': 'slender',
         'athletic': 'athletic',
         'curvy': 'curvaceous',
@@ -44,11 +62,67 @@ const personalizeContent = (content, userData) => {
 
     const getNaturalHeight = (height) => {
       const descriptions = {
+        'petite and delicate': 'petite',
+        'average height': 'average',
+        'tall and statuesque': 'tall',
+        // Fallback for simple values
         'petite (under 5\'4")': 'petite',
         'average (5\'4"-5\'7")': 'average',
         'tall (over 5\'7")': 'tall'
       };
-      return descriptions[height] || 'average';
+      return descriptions[height?.toLowerCase()] || 'average';
+    };
+
+    const getNaturalHairColor = (color) => {
+      const descriptions = {
+        'golden blonde': 'golden blonde',
+        'platinum blonde': 'platinum blonde',
+        'rich brunette': 'chestnut brown',
+        'auburn brown': 'auburn',
+        'raven black': 'raven',
+        'fiery red': 'fiery red',
+        'silver-streaked': 'silver-streaked',
+        'uniquely colored': 'uniquely colored',
+        // Fallback for simple values
+        'blonde': 'blonde',
+        'brown': 'brown',
+        'black': 'black',
+        'red': 'red'
+      };
+      return descriptions[color?.toLowerCase()] || 'brown';
+    };
+
+    const getNaturalHairType = (type) => {
+      const descriptions = {
+        'pin-straight': 'straight',
+        'softly wavy': 'wavy',
+        'lusciously curly': 'curly',
+        'naturally coily': 'coily',
+        'intricately braided': 'braided',
+        // Fallback for simple values
+        'straight': 'straight',
+        'wavy': 'wavy',
+        'curly': 'curly'
+      };
+      return descriptions[type?.toLowerCase()] || 'wavy';
+    };
+
+    const getNaturalEyeColor = (color) => {
+      const descriptions = {
+        'deep blue': 'sapphire blue',
+        'warm brown': 'warm brown',
+        'emerald green': 'emerald',
+        'golden hazel': 'hazel',
+        'striking gray': 'steel gray',
+        'violet-tinted': 'violet',
+        // Fallback for simple values
+        'blue': 'blue',
+        'brown': 'brown',
+        'green': 'green',
+        'hazel': 'hazel',
+        'gray': 'gray'
+      };
+      return descriptions[color?.toLowerCase()] || 'brown';
     };
     
     const firstName = userData.firstName || 'Alex';
@@ -73,10 +147,10 @@ const personalizeContent = (content, userData) => {
     personalizedText = personalizedText.replace(/\{\{hers\}\}/g, 'hers');
     
     // Physical appearance tokens
-    const hairColor = userData.hairColor?.toLowerCase() || 'brown';
+    const hairColor = getNaturalHairColor(userData.hairColor);
     const hairLength = getNaturalHairLength(userData.hairLength);
-    const hairType = userData.hairType?.toLowerCase() || 'wavy';
-    const eyeColor = userData.eyeColor?.toLowerCase() || 'brown';
+    const hairType = getNaturalHairType(userData.hairType);
+    const eyeColor = getNaturalEyeColor(userData.eyeColor);
     const skinTone = getNaturalSkinTone(userData.skinTone);
     const build = getNaturalBuild(userData.build);
     const heightDesc = getNaturalHeight(userData.height);
