@@ -2,8 +2,21 @@
 let stripe;
 try {
   if (process.env.STRIPE_SECRET_KEY) {
-    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-    console.log('Stripe initialized with API key');
+    // Validate Stripe key format
+    const key = process.env.STRIPE_SECRET_KEY.trim();
+    if (!key.startsWith('sk_test_') && !key.startsWith('sk_live_')) {
+      console.error('Invalid Stripe key format. Must start with sk_test_ or sk_live_');
+      throw new Error('Invalid Stripe key format');
+    }
+    
+    // Initialize Stripe with production-ready configuration
+    stripe = require('stripe')(key, {
+      apiVersion: '2023-10-16', // Use stable API version
+      maxNetworkRetries: 2, // Retry on network failures
+      timeout: 20000, // 20 second timeout for production
+      telemetry: false // Disable telemetry to reduce payload size
+    });
+    console.log(`Stripe initialized with ${key.startsWith('sk_test_') ? 'TEST' : 'LIVE'} key and production config`);
   } else {
     console.log('Stripe API key not found, using mock payment processor');
     stripe = {

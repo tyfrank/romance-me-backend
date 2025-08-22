@@ -66,17 +66,16 @@ const createCoinPaymentIntent = async (req, res) => {
       });
     }
 
-    // Create payment intent
+    // Create payment intent with minimal required fields for production
     const paymentIntent = await stripe.paymentIntents.create({
       amount: coinPackage.price,
-      currency: coinPackage.currency,
+      currency: coinPackage.currency || 'usd',
       metadata: {
         type: 'coin_purchase',
         user_id: userId,
         package_id: packageId,
-        coins: coinPackage.coins.toString()
-      },
-      description: `${coinPackage.name} - ${coinPackage.description}`
+        coins: String(coinPackage.coins)
+      }
     });
 
     res.json({
@@ -148,17 +147,16 @@ const createSubscriptionPaymentIntent = async (req, res) => {
       });
     }
 
-    // Create payment intent
+    // Create payment intent with minimal required fields for production
     const paymentIntent = await stripe.paymentIntents.create({
       amount: plan.price,
-      currency: plan.currency,
+      currency: plan.currency || 'usd',
       metadata: {
         type: 'subscription',
         user_id: userId,
         plan_id: planId,
         interval: plan.interval
-      },
-      description: `${plan.name} - ${plan.description}`
+      }
     });
 
     res.json({
