@@ -206,3 +206,23 @@ Environment: development
 Stripe initialized with API key
 Server running on port 3001
 Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+Stripe initialized with API key
+Server running on port 3001
+Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+🔧 Configuring Cloudinary with: {
+  cloud_name: 'drslehnud',
+  api_key: '5838***',
+  api_secret: 'Set (hidden)'
+}
+Stripe initialized with API key
+Server running on port 3001
+Environment: development
