@@ -28,7 +28,7 @@ const personalizeContent = (content, userData) => {
       const descriptions = {
         'porcelain fair': 'porcelain',
         'creamy light': 'fair',
-        'sun-kissed medium': 'caramel',
+        'sun-kissed': 'caramel',
         'warm olive': 'golden',
         'rich dark': 'rich',
         'deep ebony': 'deep ebony',
