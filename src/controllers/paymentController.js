@@ -87,9 +87,16 @@ const createCoinPaymentIntent = async (req, res) => {
 
   } catch (error) {
     console.error('Create coin payment intent error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      type: error.type,
+      code: error.code,
+      statusCode: error.statusCode
+    });
     res.status(500).json({
       success: false,
-      message: 'Failed to create payment intent'
+      message: 'Failed to create payment intent',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -162,9 +169,16 @@ const createSubscriptionPaymentIntent = async (req, res) => {
 
   } catch (error) {
     console.error('Create subscription payment intent error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      type: error.type,
+      code: error.code,
+      statusCode: error.statusCode
+    });
     res.status(500).json({
       success: false,
-      message: 'Failed to create payment intent'
+      message: 'Failed to create payment intent',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
