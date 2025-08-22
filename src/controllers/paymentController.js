@@ -66,6 +66,19 @@ const createCoinPaymentIntent = async (req, res) => {
       });
     }
 
+    console.log('Creating payment intent for:', {
+      userId,
+      packageId,
+      amount: coinPackage.price,
+      currency: coinPackage.currency || 'usd'
+    });
+
+    // Check if stripe is properly initialized
+    if (!stripe || !stripe.paymentIntents) {
+      console.error('Stripe not properly initialized');
+      throw new Error('Payment system not configured');
+    }
+
     // Create payment intent with minimal required fields for production
     const paymentIntent = await stripe.paymentIntents.create({
       amount: coinPackage.price,
@@ -90,12 +103,16 @@ const createCoinPaymentIntent = async (req, res) => {
       message: error.message,
       type: error.type,
       code: error.code,
-      statusCode: error.statusCode
+      statusCode: error.statusCode,
+      stack: error.stack
     });
+    console.error('NODE_ENV:', process.env.NODE_ENV);
+    
+    // Always include error in production for debugging during beta
     res.status(500).json({
       success: false,
       message: 'Failed to create payment intent',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: error.message || 'Unknown error occurred'
     });
   }
 };
@@ -171,12 +188,15 @@ const createSubscriptionPaymentIntent = async (req, res) => {
       message: error.message,
       type: error.type,
       code: error.code,
-      statusCode: error.statusCode
+      statusCode: error.statusCode,
+      stack: error.stack
     });
+    
+    // Always include error in production for debugging during beta
     res.status(500).json({
       success: false,
       message: 'Failed to create payment intent',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: error.message || 'Unknown error occurred'
     });
   }
 };
