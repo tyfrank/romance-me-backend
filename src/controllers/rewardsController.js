@@ -193,13 +193,28 @@ const dailyCheckIn = async (req, res) => {
       [newTotalCoins, totalCoinsEarned, newStreak, newLongestStreak, today, req.user.id]
     );
     
-    // Record check-in
+    // Record check-in (simplified columns)
     await client.query(
       `INSERT INTO check_in_history 
-       (user_id, check_in_date, coins_earned, streak_day, bonus_coins, bonus_reason)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [req.user.id, today, coinsEarned, newStreak, 0, `Day ${newStreak} check-in`]
+       (user_id, check_in_date, coins_earned, streak_day)
+       VALUES ($1, $2, $3, $4)`,
+      [req.user.id, today, coinsEarned, newStreak]
     );
+    
+    // Create reward_transactions table if it doesn't exist
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS reward_transactions (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        transaction_type VARCHAR(20) NOT NULL,
+        amount INTEGER NOT NULL,
+        reason TEXT,
+        reference_type VARCHAR(50),
+        reference_id UUID,
+        balance_after INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
     
     // Record transaction
     await client.query(
