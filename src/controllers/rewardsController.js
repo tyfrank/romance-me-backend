@@ -17,7 +17,7 @@ const getRewardsStatus = async (req, res) => {
         recentCheckIns: []
       });
     }
-    // Ensure rewards tables exist
+    // Ensure rewards tables exist with correct structure
     await db.query(`
       CREATE TABLE IF NOT EXISTS user_rewards (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -33,8 +33,10 @@ const getRewardsStatus = async (req, res) => {
       );
     `);
 
+    // Drop and recreate check_in_history to ensure correct structure
+    await db.query(`DROP TABLE IF EXISTS check_in_history CASCADE`);
     await db.query(`
-      CREATE TABLE IF NOT EXISTS check_in_history (
+      CREATE TABLE check_in_history (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         check_in_date DATE NOT NULL,
