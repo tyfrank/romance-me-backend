@@ -13,6 +13,14 @@ router.get('/auth/verify', requireAdminAuth, adminAuthController.verifyAdmin);
 // Dashboard and analytics
 router.get('/dashboard/stats', requireAdminAuth, adminContentController.getDashboardStats);
 
+// Enhanced Analytics Routes
+const analyticsController = require('../controllers/analyticsController');
+router.get('/analytics/engagement', requireAdminAuth, analyticsController.getUserEngagementStats);
+router.get('/analytics/content', requireAdminAuth, analyticsController.getContentPerformanceStats);
+router.get('/analytics/revenue', requireAdminAuth, analyticsController.getRevenueStats);
+router.get('/analytics/technical', requireAdminAuth, analyticsController.getTechnicalStats);
+router.get('/analytics/overview', requireAdminAuth, analyticsController.getAnalyticsOverview);
+
 // Book management routes
 router.get('/books', requireAdminAuth, adminContentController.getAllBooks);
 router.get('/books/:id', requireAdminAuth, adminContentController.getBook);
