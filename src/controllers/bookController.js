@@ -498,10 +498,29 @@ const saveChapterComment = async (req, res) => {
   const userId = req.user.id;
   
   try {
-    // Create comments table entry
+    // Ensure chapter_comments table exists
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS chapter_comments (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        book_id UUID NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+        chapter_number INTEGER NOT NULL,
+        chapter_comment TEXT,
+        next_suggestion TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, book_id, chapter_number)
+      )
+    `);
+
+    // Create or update comments table entry (allow users to update their comments)
     await db.query(
       `INSERT INTO chapter_comments (user_id, book_id, chapter_number, chapter_comment, next_suggestion, created_at)
-       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)`,
+       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
+       ON CONFLICT (user_id, book_id, chapter_number) 
+       DO UPDATE SET 
+         chapter_comment = $4,
+         next_suggestion = $5,
+         created_at = CURRENT_TIMESTAMP`,
       [userId, bookId, parseInt(chapterNumber), chapterComment?.trim() || null, nextSuggestion?.trim() || null]
     );
     
