@@ -66,31 +66,81 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
-const requireAge18 = (req, res, next) => {
-  if (!req.user || !req.user.birthDate) {
-    return res.status(403).json({ 
-      success: false, 
-      message: 'Age verification required' 
+const requireAge18 = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED'
+      });
+    }
+
+    // Get user profile with birth date using PostgreSQL
+    const userResult = await db.query(
+      `SELECT birth_date, profile_completed, created_at 
+       FROM users 
+       WHERE id = $1`,
+      [userId]
+    );
+    
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        error: 'User not found',
+        code: 'USER_NOT_FOUND'
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    // Check if user has completed age verification
+    if (!user.birth_date) {
+      return res.status(403).json({
+        success: false,
+        error: 'Age verification required',
+        code: 'AGE_VERIFICATION_REQUIRED',
+        message: 'Please complete your profile by adding your birth date',
+        action_required: 'SET_BIRTH_DATE'
+      });
+    }
+
+    // Calculate age
+    const birthDate = new Date(user.birth_date);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    // Check if user is 18+
+    if (age < 18) {
+      return res.status(403).json({
+        success: false,
+        error: 'Content restricted',
+        code: 'AGE_RESTRICTED',
+        message: 'This content is only available to users 18 and older',
+        user_age: age
+      });
+    }
+
+    // User is verified, continue to content
+    console.log(`✅ Age verification passed for user ${userId}: ${age} years old`);
+    next();
+
+  } catch (error) {
+    console.error('Age verification middleware error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Age verification failed',
+      code: 'VERIFICATION_ERROR',
+      message: 'Unable to verify age at this time'
     });
   }
-  
-  const birthDate = new Date(req.user.birthDate);
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  
-  if (age < 18) {
-    return res.status(403).json({ 
-      success: false, 
-      message: 'Must be 18 or older to access this content' 
-    });
-  }
-  
-  next();
 };
 
 module.exports = {
