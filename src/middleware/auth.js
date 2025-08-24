@@ -80,7 +80,7 @@ const requireAge18 = async (req, res, next) => {
 
     // Get user profile with birth date using PostgreSQL
     const userResult = await db.query(
-      `SELECT birth_date, profile_completed, created_at 
+      `SELECT birth_date, created_at 
        FROM users 
        WHERE id = $1`,
       [userId]
