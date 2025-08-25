@@ -2,16 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bookController = require('../controllers/bookController');
 const monetizationController = require('../controllers/monetizationController');
+const chapterAccessController = require('../controllers/chapterAccessController');
 const { requireAuth, requireAge18 } = require('../middleware/auth');
-
-// Try to import new controller, fallback to old one
-let chapterAccessController;
-try {
-  chapterAccessController = require('../controllers/chapterAccessController');
-} catch (error) {
-  console.log('Using fallback monetization controller');
-  chapterAccessController = monetizationController;
-}
 
 // All book routes require authentication
 router.use(requireAuth);
