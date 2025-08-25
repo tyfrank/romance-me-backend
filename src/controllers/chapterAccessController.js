@@ -33,6 +33,29 @@ const checkChapterAccess = async (req, res) => {
   
   try {
     console.log(`📖 Checking access for Book: ${bookId}, Chapter: ${chapterNumber}, User: ${userId || 'anonymous'}`);
+    console.log(`🔍 Query parameters: bookId=${bookId} (${typeof bookId}), chapterNumber=${chapterNumber} (${typeof chapterNumber})`);
+    
+    // First, check if the book exists at all
+    const bookCheckResult = await db.query('SELECT id, title FROM books WHERE id = $1', [bookId]);
+    console.log(`📚 Book check: found ${bookCheckResult.rows.length} books with ID ${bookId}`);
+    if (bookCheckResult.rows.length > 0) {
+      console.log(`📚 Book found: ${bookCheckResult.rows[0].title}`);
+    }
+    
+    // Check if any chapters exist for this book
+    const chapterCheckResult = await db.query('SELECT chapter_number FROM chapters WHERE book_id = $1 ORDER BY chapter_number', [bookId]);
+    console.log(`📖 Chapter check: found ${chapterCheckResult.rows.length} chapters for book ${bookId}`);
+    if (chapterCheckResult.rows.length > 0) {
+      const chapters = chapterCheckResult.rows.map(r => r.chapter_number).join(', ');
+      console.log(`📖 Available chapters: ${chapters}`);
+    }
+    
+    // Check if monetization columns exist
+    const columnCheckResult = await db.query(`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name = 'chapters' AND column_name IN ('coin_cost', 'is_premium', 'unlock_type')
+    `);
+    console.log(`💰 Monetization columns found: ${columnCheckResult.rows.length}/3`);
     
     // Get chapter info from database
     const chapterResult = await db.query(
@@ -51,10 +74,20 @@ const checkChapterAccess = async (req, res) => {
       [bookId, chapterNumber]
     );
     
+    console.log(`🔍 Main query returned ${chapterResult.rows.length} rows`);
+    
     if (chapterResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Chapter not found'
+        message: 'Chapter not found',
+        debug: {
+          bookId,
+          chapterNumber,
+          bookExists: bookCheckResult.rows.length > 0,
+          totalChaptersForBook: chapterCheckResult.rows.length,
+          availableChapters: chapterCheckResult.rows.map(r => r.chapter_number),
+          monetizationColumns: columnCheckResult.rows.length
+        }
       });
     }
     
