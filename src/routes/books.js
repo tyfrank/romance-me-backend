@@ -5,7 +5,11 @@ const monetizationController = require('../controllers/monetizationController');
 const chapterAccessController = require('../controllers/chapterAccessController');
 const { requireAuth, requireAge18 } = require('../middleware/auth');
 
-// All book routes require authentication
+// Monetization routes - allow unauthenticated access for access checks
+// This must come BEFORE the general auth middleware
+router.get('/:bookId/chapters/:chapterNumber/access', chapterAccessController.checkChapterAccess);
+
+// All other book routes require authentication
 router.use(requireAuth);
 
 // Browsing routes - no age verification needed
@@ -16,9 +20,7 @@ router.get('/:id', bookController.getBookById);
 router.get('/:bookId/chapters/:chapterNumber', requireAge18, bookController.getChapter);
 router.post('/:bookId/chapters/:chapterNumber/comment', requireAge18, bookController.saveChapterComment);
 
-// Monetization routes (isolated from core book loading)
-// Use new enhanced chapter access controller
-router.get('/:bookId/chapters/:chapterNumber/access', requireAge18, chapterAccessController.checkChapterAccess);
+// Monetization routes that require auth
 router.post('/:bookId/chapters/:chapterNumber/unlock', requireAge18, chapterAccessController.unlockChapterWithCoins);
 
 // Keep existing endpoints for backward compatibility
