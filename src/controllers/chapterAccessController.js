@@ -35,6 +35,26 @@ const checkChapterAccess = async (req, res) => {
     console.log(`📖 Checking access for Book: ${bookId}, Chapter: ${chapterNumber}, User: ${userId || 'anonymous'}`);
     console.log(`🔍 Query parameters: bookId=${bookId} (${typeof bookId}), chapterNumber=${chapterNumber} (${typeof chapterNumber})`);
     
+    // Convert chapterNumber to integer to ensure proper type matching
+    const chapterNum = parseInt(chapterNumber);
+    if (isNaN(chapterNum)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid chapter number',
+        debug: { chapterNumber, parsedAs: chapterNum }
+      });
+    }
+    
+    // Validate UUID format for bookId
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(bookId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid book ID format',
+        debug: { bookId, validFormat: 'UUID required' }
+      });
+    }
+    
     // First, check if the book exists at all
     const bookCheckResult = await db.query('SELECT id, title FROM books WHERE id = $1', [bookId]);
     console.log(`📚 Book check: found ${bookCheckResult.rows.length} books with ID ${bookId}`);
