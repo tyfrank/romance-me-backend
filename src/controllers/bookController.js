@@ -386,12 +386,14 @@ const getBookById = async (req, res) => {
 const getChapter = async (req, res) => {
   const { bookId, chapterNumber } = req.params;
   const chapterNum = parseInt(chapterNumber);
+  const userId = req.user?.id;
   
   try {
-    // Get chapter content
+    // First, get basic chapter info including monetization data
     const chapterResult = await db.query(
       `SELECT c.id, c.chapter_number, c.title, c.content, c.word_count, 
-              c.reading_time_minutes, b.total_chapters
+              c.reading_time_minutes, c.coin_cost, c.is_premium, c.unlock_type,
+              b.total_chapters, b.title as book_title, b.author
        FROM chapters c
        JOIN books b ON c.book_id = b.id
        WHERE c.book_id = $1 AND c.chapter_number = $2 AND c.is_published = true AND b.is_published = true`,
@@ -405,17 +407,106 @@ const getChapter = async (req, res) => {
       });
     }
     
-    // Get full user profile data for personalization
-    const userProfileResult = await db.query(
-      `SELECT p.first_name, p.last_name, p.hair_color, p.hair_length, p.hair_type,
-              p.eye_color, p.height, p.build, p.skin_tone, p.style_preference, p.favorite_setting
-       FROM user_profiles p
-       WHERE p.user_id = $1`,
-      [req.user.id]
-    );
-    
-    const userProfile = userProfileResult.rows[0] || {};
     const chapter = chapterResult.rows[0];
+    
+    // Check if chapter is premium and user doesn't have access
+    if (chapter.is_premium && chapterNum > 5) {
+      // For unauthenticated users, return monetization info instead of content
+      if (!userId) {
+        return res.json({
+          success: true,
+          requiresUnlock: true,
+          chapter: {
+            id: chapter.id,
+            chapterNumber: chapter.chapter_number,
+            title: chapter.title || `Chapter ${chapter.chapter_number}`,
+            bookTitle: chapter.book_title,
+            author: chapter.author,
+            coinCost: chapter.coin_cost || 20,
+            isPremium: true,
+            unlockType: 'premium',
+            totalChapters: chapter.total_chapters,
+            requiresAuth: true
+          },
+          unlockOptions: {
+            loginRequired: true,
+            coinCost: chapter.coin_cost || 20,
+            message: 'Please log in to unlock this chapter'
+          }
+        });
+      }
+      
+      // For authenticated users, check if they have unlocked this chapter
+      const unlockCheck = await db.query(
+        `SELECT id FROM user_chapter_unlocks 
+         WHERE user_id = $1 AND book_id = $2 AND chapter_number = $3`,
+        [userId, bookId, chapterNum]
+      );
+      
+      // Check for active subscription
+      const subscriptionCheck = await db.query(
+        `SELECT id FROM user_subscriptions 
+         WHERE user_id = $1 AND status = 'active' AND expires_at > NOW()`,
+        [userId]
+      );
+      
+      const hasUnlocked = unlockCheck.rows.length > 0;
+      const hasSubscription = subscriptionCheck.rows.length > 0;
+      
+      // If user hasn't unlocked and doesn't have subscription, return monetization info
+      if (!hasUnlocked && !hasSubscription) {
+        // Get user's coin balance
+        const userCoins = await db.query(
+          `SELECT total_coins FROM user_rewards WHERE user_id = $1`,
+          [userId]
+        );
+        
+        const coinBalance = userCoins.rows[0]?.total_coins || 0;
+        const coinCost = chapter.coin_cost || 20;
+        
+        return res.json({
+          success: true,
+          requiresUnlock: true,
+          chapter: {
+            id: chapter.id,
+            chapterNumber: chapter.chapter_number,
+            title: chapter.title || `Chapter ${chapter.chapter_number}`,
+            bookTitle: chapter.book_title,
+            author: chapter.author,
+            coinCost: coinCost,
+            isPremium: true,
+            unlockType: 'premium',
+            totalChapters: chapter.total_chapters
+          },
+          unlockOptions: {
+            coinBalance: coinBalance,
+            coinCost: coinCost,
+            canAfford: coinBalance >= coinCost,
+            insufficientCoins: coinBalance < coinCost,
+            coinsNeeded: Math.max(0, coinCost - coinBalance),
+            message: coinBalance >= coinCost 
+              ? `Unlock for ${coinCost} coins` 
+              : `You need ${coinCost - coinBalance} more coins`
+          }
+        });
+      }
+    }
+    
+    // If we reach here, user has access to the chapter content
+    // Either it's free, or user is authenticated and has unlocked/subscribed
+    
+    // Get full user profile data for personalization (if authenticated)
+    let userProfile = {};
+    if (userId) {
+      const userProfileResult = await db.query(
+        `SELECT p.first_name, p.last_name, p.hair_color, p.hair_length, p.hair_type,
+                p.eye_color, p.height, p.build, p.skin_tone, p.style_preference, p.favorite_setting
+         FROM user_profiles p
+         WHERE p.user_id = $1`,
+        [userId]
+      );
+      userProfile = userProfileResult.rows[0] || {};
+    }
     
     // Personalize content with full user profile data
     const personalizedContent = personalizeContent(chapter.content, {
@@ -442,8 +533,10 @@ const getChapter = async (req, res) => {
       }
     }
     
-    // Update reading progress
-    await updateReadingProgress(req.user.id, bookId, chapterNum, chapter.total_chapters);
+    // Update reading progress (only if authenticated)
+    if (userId) {
+      await updateReadingProgress(userId, bookId, chapterNum, chapter.total_chapters);
+    }
     
     res.json({
       success: true,

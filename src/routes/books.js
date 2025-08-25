@@ -9,15 +9,16 @@ const { requireAuth, requireAge18 } = require('../middleware/auth');
 // This must come BEFORE the general auth middleware
 router.get('/:bookId/chapters/:chapterNumber/access', chapterAccessController.checkChapterAccess);
 
+// Chapter content route - allows unauthenticated access for monetization flow
+// Authentication is checked within the controller based on chapter type
+router.get('/:bookId/chapters/:chapterNumber', bookController.getChapter);
+
 // All other book routes require authentication
 router.use(requireAuth);
 
 // Browsing routes - no age verification needed
 router.get('/', bookController.getBooks);
 router.get('/:id', bookController.getBookById);
-
-// Content access routes - require age verification
-router.get('/:bookId/chapters/:chapterNumber', requireAge18, bookController.getChapter);
 router.post('/:bookId/chapters/:chapterNumber/comment', requireAge18, bookController.saveChapterComment);
 
 // Monetization routes that require auth

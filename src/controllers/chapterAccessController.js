@@ -77,7 +77,7 @@ const checkChapterAccess = async (req, res) => {
     `);
     console.log(`💰 Monetization columns found: ${columnCheckResult.rows.length}/3`);
     
-    // Get chapter info from database
+    // Get chapter info from database - use parsed integer for chapter number
     const chapterResult = await db.query(
       `SELECT 
         c.id, 
@@ -91,7 +91,7 @@ const checkChapterAccess = async (req, res) => {
        FROM chapters c
        JOIN books b ON c.book_id = b.id
        WHERE c.book_id = $1 AND c.chapter_number = $2`,
-      [bookId, chapterNumber]
+      [bookId, chapterNum]
     );
     
     console.log(`🔍 Main query returned ${chapterResult.rows.length} rows`);
