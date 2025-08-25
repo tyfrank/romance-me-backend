@@ -7,17 +7,11 @@ const checkChapterAccess = async (req, res) => {
   try {
     // Safety check: Ensure user is authenticated
     if (!req.user || !req.user.id) {
-      console.log('Monetization API: No authenticated user found, granting free access');
-      return res.json({
-        success: true,
-        hasAccess: true,
-        chapter: {
-          id: 'unknown',
-          chapterNumber: parseInt(chapterNumber),
-          coinCost: 0,
-          isPremium: false,
-          unlockType: 'free'
-        }
+      console.log('Monetization API: No authenticated user found');
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required to check chapter access',
+        requiresAuth: true
       });
     }
     
@@ -38,6 +32,22 @@ const checkChapterAccess = async (req, res) => {
     }
     
     const chapter = chapterResult.rows[0];
+    
+    // If chapter is free (chapters 1-5), always grant access
+    if (!chapter.is_premium || chapter.chapter_number <= 5) {
+      return res.json({
+        success: true,
+        hasAccess: true,
+        accessType: 'free',
+        chapter: {
+          id: chapter.id,
+          number: chapter.chapter_number,
+          coinCost: 0,
+          isPremium: false,
+          unlockType: 'free'
+        }
+      });
+    }
     
     // Check if user has active subscription (bypass all locks)
     const subscriptionResult = await db.query(
@@ -91,17 +101,46 @@ const checkChapterAccess = async (req, res) => {
     const hasAccess = unlockResult.rows.length > 0;
     const unlockInfo = hasAccess ? unlockResult.rows[0] : null;
     
+    if (hasAccess) {
+      // User has already unlocked this chapter
+      return res.json({
+        success: true,
+        hasAccess: true,
+        accessType: 'unlocked',
+        chapter: {
+          id: chapter.id,
+          number: chapter.chapter_number,
+          coinCost: chapter.coin_cost,
+          isPremium: chapter.is_premium,
+          unlockType: chapter.unlock_type
+        },
+        unlockInfo
+      });
+    }
+    
+    // Chapter is locked - get user's coin balance and provide unlock options
+    const userRewardsResult = await db.query(
+      `SELECT total_coins FROM user_rewards WHERE user_id = $1`,
+      [userId]
+    );
+    
+    const userCoins = userRewardsResult.rows[0]?.total_coins || 0;
+    
     res.json({
       success: true,
-      hasAccess,
+      hasAccess: false,
+      accessType: 'locked',
       chapter: {
         id: chapter.id,
-        chapterNumber: chapter.chapter_number,
+        number: chapter.chapter_number,
         coinCost: chapter.coin_cost,
         isPremium: chapter.is_premium,
         unlockType: chapter.unlock_type
       },
-      unlockInfo
+      userBalance: userCoins,
+      insufficientCoins: userCoins < chapter.coin_cost,
+      coinsNeeded: Math.max(0, chapter.coin_cost - userCoins),
+      unlockOptions: ['coins', 'watch_ads', 'purchase_coins', 'subscribe']
     });
     
   } catch (error) {

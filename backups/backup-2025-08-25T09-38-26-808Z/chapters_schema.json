@@ -1,0 +1,121 @@
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "uuid_generate_v4()",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "book_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "chapter_number",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "title",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": null,
+    "character_maximum_length": 255
+  },
+  {
+    "column_name": "content",
+    "data_type": "jsonb",
+    "is_nullable": "NO",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "word_count",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "reading_time_minutes",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "is_published",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "true",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "CURRENT_TIMESTAMP",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "CURRENT_TIMESTAMP",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "coin_cost",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "is_premium",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "unlock_type",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": "'free'::character varying",
+    "character_maximum_length": 20
+  },
+  {
+    "column_name": "has_audio",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "audio_url",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": null,
+    "character_maximum_length": 500
+  },
+  {
+    "column_name": "narrator_name",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": null,
+    "character_maximum_length": 100
+  },
+  {
+    "column_name": "audio_duration_seconds",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null,
+    "character_maximum_length": null
+  }
+]

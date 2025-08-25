@@ -1,0 +1,72 @@
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "user_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "chapter_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "book_id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "unlock_method",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": "'free'::character varying",
+    "character_maximum_length": 20
+  },
+  {
+    "column_name": "coins_spent",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "unlocked_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "CURRENT_TIMESTAMP",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "chapter_number",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "ad_views_used",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "expires_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": null,
+    "character_maximum_length": null
+  }
+]

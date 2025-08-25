@@ -1,0 +1,26 @@
+[
+  {
+    "id": "4657318b-ca4b-40e7-a65b-ed8b4a9d8d52",
+    "user_id": "083ac0a1-3f8c-480f-a1a1-7da475387d73",
+    "chapter_id": "53fabcd4-2d7c-44ac-acac-be9544d178e5",
+    "book_id": "2c0b5739-7c95-4628-a1ed-5ba8b441a93b",
+    "unlock_method": "coins",
+    "coins_spent": 50,
+    "unlocked_at": "2025-08-24T08:26:37.915Z",
+    "chapter_number": 6,
+    "ad_views_used": 0,
+    "expires_at": null
+  },
+  {
+    "id": "5bbb7a23-42db-487a-ac37-fbd1bcc905b2",
+    "user_id": "07793ac5-1e57-402d-b939-06917a03af21",
+    "chapter_id": "6b556530-39c3-47db-b1b9-26b72bbb1043",
+    "book_id": "7708242a-d122-450b-89c4-5fd73901d585",
+    "unlock_method": "coins",
+    "coins_spent": 10,
+    "unlocked_at": "2025-08-18T07:10:47.165Z",
+    "chapter_number": 6,
+    "ad_views_used": 0,
+    "expires_at": null
+  }
+]

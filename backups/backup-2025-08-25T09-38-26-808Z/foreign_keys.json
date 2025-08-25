@@ -1,0 +1,128 @@
+[
+  {
+    "table_name": "user_profiles",
+    "constraint_name": "user_profiles_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "user_sessions",
+    "constraint_name": "user_sessions_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "chapters",
+    "constraint_name": "chapters_book_id_fkey",
+    "column_name": "book_id",
+    "foreign_table_name": "books",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "reading_progress",
+    "constraint_name": "reading_progress_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "reading_progress",
+    "constraint_name": "reading_progress_book_id_fkey",
+    "column_name": "book_id",
+    "foreign_table_name": "books",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "admin_sessions",
+    "constraint_name": "admin_sessions_admin_id_fkey",
+    "column_name": "admin_id",
+    "foreign_table_name": "admin_users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "admin_analytics",
+    "constraint_name": "admin_analytics_admin_id_fkey",
+    "column_name": "admin_id",
+    "foreign_table_name": "admin_users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "user_rewards",
+    "constraint_name": "user_rewards_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "check_in_history",
+    "constraint_name": "check_in_history_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "reward_transactions",
+    "constraint_name": "reward_transactions_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "chapter_comments",
+    "constraint_name": "chapter_comments_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "chapter_comments",
+    "constraint_name": "chapter_comments_book_id_fkey",
+    "column_name": "book_id",
+    "foreign_table_name": "books",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "user_chapter_unlocks",
+    "constraint_name": "user_chapter_unlocks_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "user_chapter_unlocks",
+    "constraint_name": "user_chapter_unlocks_chapter_id_fkey",
+    "column_name": "chapter_id",
+    "foreign_table_name": "chapters",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "user_chapter_unlocks",
+    "constraint_name": "user_chapter_unlocks_book_id_fkey",
+    "column_name": "book_id",
+    "foreign_table_name": "books",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "user_subscriptions",
+    "constraint_name": "user_subscriptions_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "user_reading_progress",
+    "constraint_name": "user_reading_progress_user_id_fkey",
+    "column_name": "user_id",
+    "foreign_table_name": "users",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_name": "user_reading_progress",
+    "constraint_name": "user_reading_progress_book_id_fkey",
+    "column_name": "book_id",
+    "foreign_table_name": "books",
+    "foreign_column_name": "id"
+  }
+]

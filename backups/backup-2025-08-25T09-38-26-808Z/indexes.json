@@ -1,0 +1,332 @@
+[
+  {
+    "schemaname": "public",
+    "tablename": "admin_analytics",
+    "indexname": "admin_analytics_pkey",
+    "indexdef": "CREATE UNIQUE INDEX admin_analytics_pkey ON public.admin_analytics USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_analytics",
+    "indexname": "idx_admin_analytics_date",
+    "indexdef": "CREATE INDEX idx_admin_analytics_date ON public.admin_analytics USING btree (created_at)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_analytics",
+    "indexname": "idx_admin_analytics_type",
+    "indexdef": "CREATE INDEX idx_admin_analytics_type ON public.admin_analytics USING btree (event_type)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_sessions",
+    "indexname": "admin_sessions_pkey",
+    "indexdef": "CREATE UNIQUE INDEX admin_sessions_pkey ON public.admin_sessions USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_sessions",
+    "indexname": "admin_sessions_token_hash_key",
+    "indexdef": "CREATE UNIQUE INDEX admin_sessions_token_hash_key ON public.admin_sessions USING btree (token_hash)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_sessions",
+    "indexname": "idx_admin_sessions_expiry",
+    "indexdef": "CREATE INDEX idx_admin_sessions_expiry ON public.admin_sessions USING btree (expires_at)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_sessions",
+    "indexname": "idx_admin_sessions_token",
+    "indexdef": "CREATE INDEX idx_admin_sessions_token ON public.admin_sessions USING btree (token_hash)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_users",
+    "indexname": "admin_users_email_key",
+    "indexdef": "CREATE UNIQUE INDEX admin_users_email_key ON public.admin_users USING btree (email)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_users",
+    "indexname": "admin_users_pkey",
+    "indexdef": "CREATE UNIQUE INDEX admin_users_pkey ON public.admin_users USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_users",
+    "indexname": "admin_users_username_key",
+    "indexdef": "CREATE UNIQUE INDEX admin_users_username_key ON public.admin_users USING btree (username)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "books",
+    "indexname": "books_pkey",
+    "indexdef": "CREATE UNIQUE INDEX books_pkey ON public.books USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "books",
+    "indexname": "idx_books_featured",
+    "indexdef": "CREATE INDEX idx_books_featured ON public.books USING btree (is_featured)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "books",
+    "indexname": "idx_books_genre",
+    "indexdef": "CREATE INDEX idx_books_genre ON public.books USING gin (genre)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "books",
+    "indexname": "idx_books_published",
+    "indexdef": "CREATE INDEX idx_books_published ON public.books USING btree (is_published)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "chapter_comments",
+    "indexname": "chapter_comments_pkey",
+    "indexdef": "CREATE UNIQUE INDEX chapter_comments_pkey ON public.chapter_comments USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "chapter_comments",
+    "indexname": "idx_chapter_comments_book_chapter",
+    "indexdef": "CREATE INDEX idx_chapter_comments_book_chapter ON public.chapter_comments USING btree (book_id, chapter_number)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "chapter_comments",
+    "indexname": "idx_chapter_comments_user",
+    "indexdef": "CREATE INDEX idx_chapter_comments_user ON public.chapter_comments USING btree (user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "chapters",
+    "indexname": "chapters_book_id_chapter_number_key",
+    "indexdef": "CREATE UNIQUE INDEX chapters_book_id_chapter_number_key ON public.chapters USING btree (book_id, chapter_number)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "chapters",
+    "indexname": "chapters_pkey",
+    "indexdef": "CREATE UNIQUE INDEX chapters_pkey ON public.chapters USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "chapters",
+    "indexname": "idx_chapters_book_number",
+    "indexdef": "CREATE INDEX idx_chapters_book_number ON public.chapters USING btree (book_id, chapter_number)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "chapters",
+    "indexname": "idx_chapters_premium_lookup",
+    "indexdef": "CREATE INDEX idx_chapters_premium_lookup ON public.chapters USING btree (book_id, chapter_number, is_premium)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "chapters",
+    "indexname": "idx_chapters_published",
+    "indexdef": "CREATE INDEX idx_chapters_published ON public.chapters USING btree (is_published)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "check_in_history",
+    "indexname": "check_in_history_pkey",
+    "indexdef": "CREATE UNIQUE INDEX check_in_history_pkey ON public.check_in_history USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "check_in_history",
+    "indexname": "check_in_history_user_id_check_in_date_key",
+    "indexdef": "CREATE UNIQUE INDEX check_in_history_user_id_check_in_date_key ON public.check_in_history USING btree (user_id, check_in_date)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "check_in_history",
+    "indexname": "idx_check_in_history_user_date",
+    "indexdef": "CREATE INDEX idx_check_in_history_user_date ON public.check_in_history USING btree (user_id, check_in_date DESC)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reading_progress",
+    "indexname": "idx_reading_progress_book",
+    "indexdef": "CREATE INDEX idx_reading_progress_book ON public.reading_progress USING btree (book_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reading_progress",
+    "indexname": "idx_reading_progress_last_read",
+    "indexdef": "CREATE INDEX idx_reading_progress_last_read ON public.reading_progress USING btree (last_read_at)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reading_progress",
+    "indexname": "idx_reading_progress_user",
+    "indexdef": "CREATE INDEX idx_reading_progress_user ON public.reading_progress USING btree (user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reading_progress",
+    "indexname": "reading_progress_pkey",
+    "indexdef": "CREATE UNIQUE INDEX reading_progress_pkey ON public.reading_progress USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reading_progress",
+    "indexname": "reading_progress_user_id_book_id_key",
+    "indexdef": "CREATE UNIQUE INDEX reading_progress_user_id_book_id_key ON public.reading_progress USING btree (user_id, book_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reward_transactions",
+    "indexname": "idx_reward_transactions_user",
+    "indexdef": "CREATE INDEX idx_reward_transactions_user ON public.reward_transactions USING btree (user_id, created_at DESC)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "reward_transactions",
+    "indexname": "reward_transactions_pkey",
+    "indexdef": "CREATE UNIQUE INDEX reward_transactions_pkey ON public.reward_transactions USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "stories",
+    "indexname": "idx_stories_active",
+    "indexdef": "CREATE INDEX idx_stories_active ON public.stories USING btree (is_active)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "stories",
+    "indexname": "stories_pkey",
+    "indexdef": "CREATE UNIQUE INDEX stories_pkey ON public.stories USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_chapter_unlocks",
+    "indexname": "idx_user_chapter_unlocks_user_book",
+    "indexdef": "CREATE INDEX idx_user_chapter_unlocks_user_book ON public.user_chapter_unlocks USING btree (user_id, book_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_chapter_unlocks",
+    "indexname": "idx_user_unlocks_fast_lookup",
+    "indexdef": "CREATE INDEX idx_user_unlocks_fast_lookup ON public.user_chapter_unlocks USING btree (user_id, book_id, chapter_number)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_chapter_unlocks",
+    "indexname": "user_chapter_unlocks_pkey",
+    "indexdef": "CREATE UNIQUE INDEX user_chapter_unlocks_pkey ON public.user_chapter_unlocks USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_chapter_unlocks",
+    "indexname": "user_chapter_unlocks_user_id_chapter_id_key",
+    "indexdef": "CREATE UNIQUE INDEX user_chapter_unlocks_user_id_chapter_id_key ON public.user_chapter_unlocks USING btree (user_id, chapter_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_profiles",
+    "indexname": "user_profiles_pkey",
+    "indexdef": "CREATE UNIQUE INDEX user_profiles_pkey ON public.user_profiles USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_profiles",
+    "indexname": "user_profiles_user_id_key",
+    "indexdef": "CREATE UNIQUE INDEX user_profiles_user_id_key ON public.user_profiles USING btree (user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_reading_progress",
+    "indexname": "user_reading_progress_pkey",
+    "indexdef": "CREATE UNIQUE INDEX user_reading_progress_pkey ON public.user_reading_progress USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_reading_progress",
+    "indexname": "user_reading_progress_user_id_book_id_key",
+    "indexdef": "CREATE UNIQUE INDEX user_reading_progress_user_id_book_id_key ON public.user_reading_progress USING btree (user_id, book_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_rewards",
+    "indexname": "user_rewards_pkey",
+    "indexdef": "CREATE UNIQUE INDEX user_rewards_pkey ON public.user_rewards USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_rewards",
+    "indexname": "user_rewards_user_id_key",
+    "indexdef": "CREATE UNIQUE INDEX user_rewards_user_id_key ON public.user_rewards USING btree (user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_sessions",
+    "indexname": "idx_sessions_expiry",
+    "indexdef": "CREATE INDEX idx_sessions_expiry ON public.user_sessions USING btree (expires_at)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_sessions",
+    "indexname": "idx_sessions_token",
+    "indexdef": "CREATE INDEX idx_sessions_token ON public.user_sessions USING btree (token_hash)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_sessions",
+    "indexname": "user_sessions_pkey",
+    "indexdef": "CREATE UNIQUE INDEX user_sessions_pkey ON public.user_sessions USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_sessions",
+    "indexname": "user_sessions_token_hash_key",
+    "indexdef": "CREATE UNIQUE INDEX user_sessions_token_hash_key ON public.user_sessions USING btree (token_hash)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_subscriptions",
+    "indexname": "idx_user_subscriptions_active",
+    "indexdef": "CREATE INDEX idx_user_subscriptions_active ON public.user_subscriptions USING btree (user_id, status, expires_at) WHERE ((status)::text = 'active'::text)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_subscriptions",
+    "indexname": "idx_user_subscriptions_expires",
+    "indexdef": "CREATE INDEX idx_user_subscriptions_expires ON public.user_subscriptions USING btree (expires_at)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_subscriptions",
+    "indexname": "idx_user_subscriptions_user_active",
+    "indexdef": "CREATE INDEX idx_user_subscriptions_user_active ON public.user_subscriptions USING btree (user_id, status, expires_at)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "user_subscriptions",
+    "indexname": "user_subscriptions_pkey",
+    "indexdef": "CREATE UNIQUE INDEX user_subscriptions_pkey ON public.user_subscriptions USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "users",
+    "indexname": "idx_users_email",
+    "indexdef": "CREATE INDEX idx_users_email ON public.users USING btree (email)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "users",
+    "indexname": "users_email_key",
+    "indexdef": "CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "users",
+    "indexname": "users_pkey",
+    "indexdef": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)"
+  }
+]

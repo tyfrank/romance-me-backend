@@ -1,0 +1,114 @@
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "is_nullable": "NO",
+    "column_default": "uuid_generate_v4()",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "title",
+    "data_type": "character varying",
+    "is_nullable": "NO",
+    "column_default": null,
+    "character_maximum_length": 255
+  },
+  {
+    "column_name": "description",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "synopsis",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "author",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": "'Author'::character varying",
+    "character_maximum_length": 255
+  },
+  {
+    "column_name": "genre",
+    "data_type": "ARRAY",
+    "is_nullable": "YES",
+    "column_default": "'{}'::character varying[]",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "content_rating",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": "'18+'::character varying",
+    "character_maximum_length": 20
+  },
+  {
+    "column_name": "total_chapters",
+    "data_type": "integer",
+    "is_nullable": "NO",
+    "column_default": "0",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "word_count",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "reading_time_minutes",
+    "data_type": "integer",
+    "is_nullable": "YES",
+    "column_default": "0",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "cover_image_url",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null,
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "is_published",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "is_featured",
+    "data_type": "boolean",
+    "is_nullable": "YES",
+    "column_default": "false",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "CURRENT_TIMESTAMP",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "is_nullable": "YES",
+    "column_default": "CURRENT_TIMESTAMP",
+    "character_maximum_length": null
+  },
+  {
+    "column_name": "status",
+    "data_type": "character varying",
+    "is_nullable": "YES",
+    "column_default": "'ongoing'::character varying",
+    "character_maximum_length": 20
+  }
+]

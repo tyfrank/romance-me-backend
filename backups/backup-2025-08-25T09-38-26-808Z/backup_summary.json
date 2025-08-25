@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-08-25T09:38:26.917Z",
+  "database": "Local",
+  "backupLocation": "./backups/backup-2025-08-25T09-38-26-808Z",
+  "tablesBackedUp": [
+    "books",
+    "chapters",
+    "users",
+    "user_chapter_unlocks",
+    "user_rewards",
+    "user_reading_progress"
+  ],
+  "instructions": {
+    "restore": "Use restore-from-backup.js script",
+    "location": "./backups/backup-2025-08-25T09-38-26-808Z"
+  }
+}
