@@ -7,7 +7,7 @@ const generateToken = (userId) => {
   return jwt.sign(
     { userId },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
   );
 };
 
@@ -113,7 +113,7 @@ const register = async (req, res) => {
     
     // Create session
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
+    expiresAt.setDate(expiresAt.getDate() + 30); // 30 days from now
     
     await client.query(
       `INSERT INTO user_sessions (user_id, token_hash, expires_at) 
@@ -193,7 +193,7 @@ const login = async (req, res) => {
     
     // Create new session
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
+    expiresAt.setDate(expiresAt.getDate() + 30); // 30 days session
     
     await db.query(
       `INSERT INTO user_sessions (user_id, token_hash, expires_at) 
