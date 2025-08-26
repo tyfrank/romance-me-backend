@@ -102,7 +102,7 @@ const personalizeContent = (content, userData) => {
         // Fallback for simple values
         'straight': 'straight',
         'wavy': 'wavy',
-        'curly': 'curly'
+        'curvy': 'curly'
       };
       return descriptions[type?.toLowerCase()] || 'wavy';
     };
@@ -125,8 +125,8 @@ const personalizeContent = (content, userData) => {
       return descriptions[color?.toLowerCase()] || 'brown';
     };
     
-    const firstName = userData.firstName || 'Alex';
-    const lastName = userData.lastName || 'Morgan';
+    const firstName = userData.firstName || 'Tina';
+    const lastName = userData.lastName || 'Franklin';
     const fullName = `${firstName} ${lastName}`.trim();
     
     let personalizedText = text;
@@ -388,7 +388,7 @@ const getChapter = async (req, res) => {
   const chapterNum = parseInt(chapterNumber);
   
   try {
-    // Get chapter content - NO AUTHENTICATION OR MONETIZATION CHECKS
+    // Get chapter content
     const chapterResult = await db.query(
       `SELECT c.id, c.chapter_number, c.title, c.content, c.word_count, 
               c.reading_time_minutes, b.total_chapters
@@ -405,27 +405,49 @@ const getChapter = async (req, res) => {
       });
     }
     
+    // Get full user profile data for personalization (optional - use defaults if no user)
+    let userProfile = {};
+    if (req.user?.id) {
+      const userProfileResult = await db.query(
+        `SELECT p.first_name, p.last_name, p.hair_color, p.hair_length, p.hair_type,
+                p.eye_color, p.height, p.build, p.skin_tone, p.style_preference, p.favorite_setting
+         FROM user_profiles p
+         WHERE p.user_id = $1`,
+        [req.user.id]
+      );
+      userProfile = userProfileResult.rows[0] || {};
+    }
+    
     const chapter = chapterResult.rows[0];
     
-    // Basic content processing without personalization
-    let content = '';
-    if (typeof chapter.content === 'string') {
-      content = chapter.content;
-    } else if (chapter.content && chapter.content.sections) {
-      const textSections = chapter.content.sections.filter(section => section.type === 'paragraph');
-      content = textSections.map(section => section.text).join('\n\n');
-    } else if (chapter.content && typeof chapter.content === 'object') {
-      content = JSON.stringify(chapter.content, null, 2);
-    }
+    // Personalize content with user profile data or defaults
+    const personalizedContent = personalizeContent(chapter.content, {
+      firstName: userProfile.first_name,
+      lastName: userProfile.last_name,
+      hairColor: userProfile.hair_color,
+      hairLength: userProfile.hair_length,
+      hairType: userProfile.hair_type,
+      eyeColor: userProfile.eye_color,
+      height: userProfile.height,
+      build: userProfile.build,
+      skinTone: userProfile.skin_tone,
+      stylePreference: userProfile.style_preference,
+      favoriteSetting: userProfile.favorite_setting
+    });
     
     // Extract chapter title from content if not set
     let chapterTitle = chapter.title;
-    if (!chapterTitle && chapter.content && chapter.content.sections && chapter.content.sections[0]) {
-      const firstSection = chapter.content.sections[0].text;
+    if (!chapterTitle && personalizedContent.sections && personalizedContent.sections[0]) {
+      const firstSection = personalizedContent.sections[0].text;
       const titleMatch = firstSection.match(/^:\s*(.+?)(?:\n|$)/);
       if (titleMatch) {
         chapterTitle = titleMatch[1];
       }
+    }
+    
+    // Update reading progress (only if user is logged in)
+    if (req.user?.id) {
+      await updateReadingProgress(req.user.id, bookId, chapterNum, chapter.total_chapters);
     }
     
     res.json({
@@ -434,7 +456,7 @@ const getChapter = async (req, res) => {
         id: chapter.id,
         chapterNumber: chapter.chapter_number,
         title: chapterTitle || `Chapter ${chapter.chapter_number}`,
-        content: chapter.content,
+        content: personalizedContent,
         wordCount: chapter.word_count,
         readingTime: chapter.reading_time_minutes,
         totalChapters: chapter.total_chapters

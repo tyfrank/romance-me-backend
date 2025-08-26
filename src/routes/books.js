@@ -9,7 +9,7 @@ const { requireAuth, requireAge18 } = require('../middleware/auth');
 router.get('/', bookController.getBooks);
 router.get('/:id', bookController.getBookById);
 router.get('/:bookId/chapters/:chapterNumber', bookController.getChapter);
-router.post('/:bookId/chapters/:chapterNumber/comment', bookController.saveChapterComment);
+router.post('/:bookId/chapters/:chapterNumber/comment', requireAuth, bookController.saveChapterComment);
 
 // Keep existing endpoints for backward compatibility
 router.get('/:bookId/unlocked-chapters', requireAge18, monetizationController.getUserUnlockedChapters);
